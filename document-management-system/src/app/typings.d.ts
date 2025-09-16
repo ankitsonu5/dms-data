@@ -1,0 +1,2 @@
+declare module 'feather-icons';
+

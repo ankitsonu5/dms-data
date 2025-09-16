@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../../../api/src/models/Admin.js"],
+  "sourcesContent": ["'use strict';\n\nconst mongoose = require('mongoose');\n\nconst AdminSchema = new mongoose.Schema(\n  {\n    email: { type: String, required: true, unique: true, lowercase: true, trim: true },\n    passwordHash: { type: String, required: true },\n    role: { type: String, enum: ['admin'], default: 'admin' },\n  },\n  { timestamps: true }\n);\n\nAdminSchema.index({ email: 1 }, { unique: true });\n\nmodule.exports = mongoose.model('Admin', AdminSchema);\n\n"],
+  "mappings": ";AAEA,MAAM,WAAW,QAAQ,UAAU;AAEnC,MAAM,cAAc,IAAI,SAAS;AAAA,EAC/B;AAAA,IACE,OAAO,EAAE,MAAM,QAAQ,UAAU,MAAM,QAAQ,MAAM,WAAW,MAAM,MAAM,KAAK;AAAA,IACjF,cAAc,EAAE,MAAM,QAAQ,UAAU,KAAK;AAAA,IAC7C,MAAM,EAAE,MAAM,QAAQ,MAAM,CAAC,OAAO,GAAG,SAAS,QAAQ;AAAA,EAC1D;AAAA,EACA,EAAE,YAAY,KAAK;AACrB;AAEA,YAAY,MAAM,EAAE,OAAO,EAAE,GAAG,EAAE,QAAQ,KAAK,CAAC;AAEhD,OAAO,UAAU,SAAS,MAAM,SAAS,WAAW;",
+  "names": []
+}

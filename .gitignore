@@ -1,0 +1,8 @@
+
+.nx/installation
+.nx/cache
+.nx/workspace-data
+.angular
+
+.env
+node_modules

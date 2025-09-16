@@ -1,0 +1,89 @@
+<div class="min-h-screen bg-gray-50">
+  <!-- Topbar -->
+  <header class="sticky top-0 z-10 bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60 border-b">
+    <div class="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow">
+          <span [featherIcon]="'folder'" class="h-4 w-4"></span>
+        </div>
+        <div class="text-sm">
+          <div class="font-semibold leading-4">Document Management</div>
+          <div class="text-gray-500 leading-4">Admin Dashboard</div>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="hidden sm:block text-sm text-gray-600" *ngIf="userEmail">{{ userEmail }}</div>
+        <button (click)="logout()" class="inline-flex items-center gap-2 rounded-md bg-gray-900 px-3 py-2 text-white hover:bg-black">
+          <span [featherIcon]="'log-out'" class="h-4 w-4"></span>
+          <span class="text-sm">Logout</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="mx-auto max-w-7xl px-4 py-8 grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-6">
+    <!-- Sidebar -->
+    <aside class="lg:sticky lg:top-16 self-start">
+      <nav class="rounded-xl border bg-white p-3 shadow-sm">
+        <a class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm hover:bg-gray-50" href="#">
+          <span [featherIcon]="'home'" class="h-4 w-4 text-gray-500 group-hover:text-gray-700"></span>
+          <span>Home</span>
+        </a>
+        <a class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm hover:bg-gray-50" href="#">
+          <span [featherIcon]="'file-text'" class="h-4 w-4 text-gray-500 group-hover:text-gray-700"></span>
+          <span>Documents</span>
+        </a>
+        <a class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm hover:bg-gray-50" href="#">
+          <span [featherIcon]="'users'" class="h-4 w-4 text-gray-500 group-hover:text-gray-700"></span>
+          <span>Users</span>
+        </a>
+        <a class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm hover:bg-gray-50" href="#">
+          <span [featherIcon]="'settings'" class="h-4 w-4 text-gray-500 group-hover:text-gray-700"></span>
+          <span>Settings</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main content -->
+    <main>
+      <div class="rounded-2xl border bg-gradient-to-br from-indigo-50 to-white p-6 shadow-sm">
+        <div class="mb-2 text-sm text-gray-600">Welcome</div>
+        <h1 class="text-2xl font-semibold tracking-tight">Good to see you{{ userEmail ? ', ' + userEmail : '' }}!</h1>
+        <p class="mt-2 text-gray-600 max-w-prose">
+          You are logged in as <span class="font-medium">Admin</span>. This is your starting dashboard. I can add cards, charts and tables next.
+        </p>
+
+        <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="rounded-xl border bg-white p-4 shadow-sm">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-sm text-gray-500">Documents</div>
+                <div class="mt-1 text-2xl font-semibold">—</div>
+              </div>
+              <span [featherIcon]="'file'" class="h-5 w-5 text-indigo-600"></span>
+            </div>
+          </div>
+          <div class="rounded-xl border bg-white p-4 shadow-sm">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-sm text-gray-500">Users</div>
+                <div class="mt-1 text-2xl font-semibold">—</div>
+              </div>
+              <span [featherIcon]="'user'" class="h-5 w-5 text-indigo-600"></span>
+            </div>
+          </div>
+          <div class="rounded-xl border bg-white p-4 shadow-sm">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-sm text-gray-500">Storage</div>
+                <div class="mt-1 text-2xl font-semibold">—</div>
+              </div>
+              <span [featherIcon]="'hard-drive'" class="h-5 w-5 text-indigo-600"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+

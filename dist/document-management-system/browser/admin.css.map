@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["document-management-system/src/app/admin/admin.scss"],
+  "sourcesContent": [".card { @apply rounded-xl border bg-white p-4 shadow-sm; }\n\n"],
+  "mappings": ";AAAA,CAAA;AAAQ,SAAA,WAAA,OAAA,SAAA,IAAA;;",
+  "names": []
+}

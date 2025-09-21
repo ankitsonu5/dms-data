@@ -1,0 +1,14 @@
+<div class="space-y-6">
+  <div class="rounded-xl border bg-white p-4 shadow-sm">
+    <h2 class="text-lg font-semibold mb-3">Password Reset</h2>
+    <p class="text-sm text-gray-600 mb-3">Send a password reset link to a user via email.</p>
+    <div class="grid sm:grid-cols-[1fr_auto] gap-3">
+      <input [(ngModel)]="email" placeholder="User email" class="border rounded px-3 py-2" />
+      <button (click)="send()" [disabled]="pending || !email" class="bg-indigo-600 text-white rounded px-4">
+        {{ pending ? 'Sending…' : 'Send reset link' }}
+      </button>
+    </div>
+    <div *ngIf="message" class="mt-3 text-sm" [class.text-green-700]="ok" [class.text-red-600]="!ok">{{ message }}</div>
+  </div>
+</div>
+

@@ -29,15 +29,15 @@
           <span [featherIcon]="'home'" class="h-4 w-4 text-gray-500 group-hover:text-gray-700"></span>
           <span>Home</span>
         </a>
-        <a class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm hover:bg-gray-50" href="#">
+        <a class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm hover:bg-gray-50" [routerLink]="['/documents']">
           <span [featherIcon]="'file-text'" class="h-4 w-4 text-gray-500 group-hover:text-gray-700"></span>
           <span>Documents</span>
         </a>
-        <a class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm hover:bg-gray-50" href="#">
+        <a class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm hover:bg-gray-50" [routerLink]="['/users']">
           <span [featherIcon]="'users'" class="h-4 w-4 text-gray-500 group-hover:text-gray-700"></span>
           <span>Users</span>
         </a>
-        <a class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm hover:bg-gray-50" href="#">
+        <a class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm hover:bg-gray-50" [routerLink]="['/settings']">
           <span [featherIcon]="'settings'" class="h-4 w-4 text-gray-500 group-hover:text-gray-700"></span>
           <span>Settings</span>
         </a>

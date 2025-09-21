@@ -25,5 +25,13 @@ export class AuthService {
   get token(): string | null {
     return localStorage.getItem('token');
   }
+
+  forgot(email: string): Observable<{ ok: boolean }> {
+    return this.http.post<{ ok: boolean }>(`${this.api}/auth/forgot`, { email });
+  }
+
+  reset(token: string, password: string): Observable<{ ok: boolean }> {
+    return this.http.post<{ ok: boolean }>(`${this.api}/auth/reset`, { token, password });
+  }
 }
 

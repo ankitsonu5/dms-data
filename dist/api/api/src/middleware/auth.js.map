@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../../../api/src/middleware/auth.js"],
+  "sourcesContent": ["'use strict';\n\nconst jwt = require('jsonwebtoken');\n\nfunction auth(req, res, next) {\n  const header = req.headers['authorization'] || '';\n  const token = header.startsWith('Bearer ') ? header.slice(7) : null;\n  if (!token) return res.status(401).json({ error: 'Unauthorized' });\n  try {\n    const payload = jwt.verify(token, process.env.JWT_SECRET || '');\n    req.user = payload;\n    next();\n  } catch (e) {\n    return res.status(401).json({ error: 'Invalid token' });\n  }\n}\n\nmodule.exports = { auth };\n\n"],
+  "mappings": ";AAEA,MAAM,MAAM,QAAQ,cAAc;AAElC,SAAS,KAAK,KAAK,KAAK,MAAM;AAC5B,QAAM,SAAS,IAAI,QAAQ,eAAe,KAAK;AAC/C,QAAM,QAAQ,OAAO,WAAW,SAAS,IAAI,OAAO,MAAM,CAAC,IAAI;AAC/D,MAAI,CAAC;AAAO,WAAO,IAAI,OAAO,GAAG,EAAE,KAAK,EAAE,OAAO,eAAe,CAAC;AACjE,MAAI;AACF,UAAM,UAAU,IAAI,OAAO,OAAO,QAAQ,IAAI,cAAc,EAAE;AAC9D,QAAI,OAAO;AACX,SAAK;AAAA,EACP,SAAS,GAAG;AACV,WAAO,IAAI,OAAO,GAAG,EAAE,KAAK,EAAE,OAAO,gBAAgB,CAAC;AAAA,EACxD;AACF;AAEA,OAAO,UAAU,EAAE,KAAK;",
+  "names": []
+}

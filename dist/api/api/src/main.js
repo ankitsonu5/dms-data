@@ -4,6 +4,8 @@ const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const authRouter = require("./routes/auth");
+const documentsRouter = require("./routes/documents");
+const usersRouter = require("./routes/users");
 dotenv.config();
 const host = process.env.HOST || "localhost";
 const port = process.env.PORT ? Number(process.env.PORT) : 3e3;
@@ -29,6 +31,8 @@ async function start() {
     })
   );
   app.use("/auth", authRouter);
+  app.use("/documents", documentsRouter);
+  app.use("/users", usersRouter);
   app.get("/health", (_req, res) => {
     res.send({ ok: true });
   });

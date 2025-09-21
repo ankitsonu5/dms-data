@@ -34,6 +34,31 @@ export class DocumentsService {
     return this.http.get<DocumentItem[]>(`${this.api}/documents${qs ? '?' + qs : ''}`);
   }
 
+  // Server-side paged search; returns items and total from X-Total-Count header
+  searchPaged(params: { category?: string; from?: string; to?: string; page: number; limit: number; sortBy?: 'createdAt'|'title'|'category'; sortDir?: 'asc'|'desc'; }): Observable<{ items: DocumentItem[]; total: number; }>{
+    const query = new URLSearchParams();
+    if (params.category) query.set('category', params.category);
+    if (params.from) query.set('from', params.from);
+    if (params.to) query.set('to', params.to);
+    query.set('page', String(params.page));
+    query.set('limit', String(params.limit));
+    if (params.sortBy) query.set('sortBy', params.sortBy);
+    if (params.sortDir) query.set('sortDir', params.sortDir);
+    const url = `${this.api}/documents?${query.toString()}`;
+    return new Observable((observer) => {
+      this.http.get<DocumentItem[]>(url, { observe: 'response' }).subscribe({
+        next: (resp) => {
+          const items = resp.body || [];
+          const totalHeader = resp.headers.get('X-Total-Count');
+          const total = totalHeader ? Number(totalHeader) : items.length;
+          observer.next({ items, total });
+          observer.complete();
+        },
+        error: (err) => observer.error(err),
+      });
+    });
+  }
+
   upload(payload: { title: string; description?: string; category?: string; file: File }): Observable<DocumentItem> {
     const form = new FormData();
     form.append('title', payload.title);

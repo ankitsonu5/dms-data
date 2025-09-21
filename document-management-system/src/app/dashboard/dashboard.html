@@ -1,0 +1,26 @@
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <h1 class="text-xl font-semibold">Dashboard</h1>
+    <button (click)="refresh()" class="inline-flex items-center rounded-md bg-gray-900 px-3 py-2 text-white hover:bg-black text-sm">
+      Refresh
+    </button>
+  </div>
+
+  <div *ngIf="loading" class="text-gray-600 text-sm">Loading...</div>
+
+  <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" *ngIf="!loading && stats">
+    <div class="rounded-xl border bg-white p-5 shadow-sm">
+      <div class="text-gray-500 text-sm">Total Documents</div>
+      <div class="mt-1 text-3xl font-semibold">{{ stats?.documentsTotal }}</div>
+    </div>
+    <div class="rounded-xl border bg-white p-5 shadow-sm">
+      <div class="text-gray-500 text-sm">Uploaded Today</div>
+      <div class="mt-1 text-3xl font-semibold">{{ stats?.documentsToday }}</div>
+    </div>
+    <div class="rounded-xl border bg-white p-5 shadow-sm">
+      <div class="text-gray-500 text-sm">Total Users</div>
+      <div class="mt-1 text-3xl font-semibold">{{ stats?.usersTotal }}</div>
+    </div>
+  </div>
+</div>
+

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "concurrently \"nx serve document-management-system\" \"nx serve api\"",
+    "dev": "cross-env NX_DAEMON=false concurrently \"nx serve document-management-system\" \"nx serve api\"",
     "start:web": "nx serve document-management-system",
     "start:api": "nx serve api",
     "build:web": "nx build document-management-system",
@@ -53,6 +53,7 @@
     "angular-eslint": "^20.2.0",
     "autoprefixer": "^10.4.21",
     "concurrently": "^9.2.1",
+    "cross-env": "^10.0.0",
     "cypress": "^14.2.1",
     "esbuild": "^0.19.2",
     "eslint": "^9.8.0",

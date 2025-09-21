@@ -37,7 +37,8 @@ function fileFilter(_req, file, cb) {
 
 const upload = multer({ storage, fileFilter, limits: { fileSize: 25 * 1024 * 1024 } });
 
-// List with optional filters: ?category=..&from=YYYY-MM-DD&to=YYYY-MM-DD
+// List with optional filters and pagination:
+// ?category=..&from=YYYY-MM-DD&to=YYYY-MM-DD&sortBy=createdAt|title|category&sortDir=asc|desc&page=1&limit=20
 router.get('/', auth, async (req, res) => {
   const { category, from, to } = req.query || {};
   const filter = {};
@@ -52,7 +53,28 @@ router.get('/', auth, async (req, res) => {
       filter.createdAt.$lte = end;
     }
   }
-  const docs = await Document.find(filter).sort({ createdAt: -1 });
+
+  // Sorting
+  const allowedSort = new Set(['createdAt', 'title', 'category']);
+  const sortBy = allowedSort.has(String(req.query.sortBy || 'createdAt'))
+    ? String(req.query.sortBy || 'createdAt')
+    : 'createdAt';
+  const sortDir = String(req.query.sortDir || 'desc') === 'asc' ? 1 : -1;
+  const sort = { [sortBy]: sortDir };
+
+  // Pagination (only apply if both page and limit are provided)
+  const page = req.query.page ? Math.max(parseInt(String(req.query.page), 10) || 1, 1) : null;
+  const limit = req.query.limit ? Math.max(parseInt(String(req.query.limit), 10) || 1, 1) : null;
+
+  if (page && limit) {
+    const total = await Document.countDocuments(filter);
+    const items = await Document.find(filter).sort(sort).skip((page - 1) * limit).limit(limit);
+    res.set('X-Total-Count', String(total));
+    return res.json(items);
+  }
+
+  // No pagination requested -> return all (existing behavior)
+  const docs = await Document.find(filter).sort(sort);
   res.json(docs);
 });
 

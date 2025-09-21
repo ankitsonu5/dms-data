@@ -17,5 +17,9 @@ const DocumentSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Indexes for faster filtering/sorting on large datasets
+DocumentSchema.index({ createdAt: -1 });
+DocumentSchema.index({ category: 1, createdAt: -1 });
+
 module.exports = mongoose.model('Document', DocumentSchema);
 

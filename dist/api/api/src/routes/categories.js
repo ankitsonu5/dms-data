@@ -2,7 +2,7 @@
 const express = require("express");
 const router = express.Router();
 const Category = require("../models/Category");
-const auth = require("../middleware/auth");
+const { auth } = require("../middleware/auth");
 router.get("/", auth, async (_req, res) => {
   const cats = await Category.find().sort({ name: 1 });
   res.json(cats);

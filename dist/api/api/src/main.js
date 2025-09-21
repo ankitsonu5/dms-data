@@ -7,6 +7,7 @@ const authRouter = require("./routes/auth");
 const documentsRouter = require("./routes/documents");
 const usersRouter = require("./routes/users");
 const categoriesRouter = require("./routes/categories");
+const { auth } = require("./middleware/auth");
 dotenv.config();
 const host = process.env.HOST || "localhost";
 const port = process.env.PORT ? Number(process.env.PORT) : 3e3;
@@ -35,6 +36,20 @@ async function start() {
   app.use("/documents", documentsRouter);
   app.use("/users", usersRouter);
   app.use("/categories", categoriesRouter);
+  app.get("/stats", auth, async (_req, res) => {
+    const Document = require("./models/Document");
+    const Admin = require("./models/Admin");
+    const start2 = /* @__PURE__ */ new Date();
+    start2.setHours(0, 0, 0, 0);
+    const end = /* @__PURE__ */ new Date();
+    end.setHours(23, 59, 59, 999);
+    const [documentsTotal, documentsToday, usersTotal] = await Promise.all([
+      Document.countDocuments({}),
+      Document.countDocuments({ createdAt: { $gte: start2, $lte: end } }),
+      Admin.countDocuments({})
+    ]);
+    res.json({ documentsTotal, documentsToday, usersTotal });
+  });
   app.get("/health", (_req, res) => {
     res.send({ ok: true });
   });

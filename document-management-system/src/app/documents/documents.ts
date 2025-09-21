@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DocumentsService, DocumentItem } from './documents.service';
 import { CategoriesService } from '../categories/categories.service';
+import { FeatherIcon } from '../shared/directives/feather-icon';
 
 @Component({
   selector: 'app-documents',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FeatherIcon],
   templateUrl: './documents.html',
   styleUrls: ['./documents.scss'],
 })
@@ -44,6 +45,26 @@ export class DocumentsComponent implements OnInit {
   onFile(e: Event) {
     const input = e.target as HTMLInputElement;
     this.file = input.files && input.files[0] ? input.files[0] : null;
+    if (this.file) this.title = this.file.name;
+  }
+
+  onDragOver(e: DragEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  onDrop(e: DragEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0] ? e.dataTransfer.files[0] : null;
+    if (f) {
+      this.file = f;
+      this.title = f.name;
+    }
+  }
+
+  clearFile() {
+    this.file = null;
   }
 
   onUpload() {
@@ -101,6 +122,33 @@ export class DocumentsComponent implements OnInit {
   onDelete(d: DocumentItem) {
     if (!confirm('Delete this document?')) return;
     this.svc.remove(d._id).subscribe(() => this.refresh());
+  }
+
+  // Preview state and actions
+  previewDoc: DocumentItem | null = null;
+  previewUrl: string | null = null;
+  previewLoading = false;
+
+  onView(d: DocumentItem) {
+    // Open modal immediately with loader, then load blob
+    this.previewDoc = d;
+    this.previewUrl = null;
+    this.previewLoading = true;
+    this.svc.download(d._id).subscribe({
+      next: (blob: Blob) => {
+        if (this.previewUrl) { try { URL.revokeObjectURL(this.previewUrl); } catch {} }
+        this.previewUrl = URL.createObjectURL(blob);
+        this.previewLoading = false;
+      },
+      error: () => { this.previewLoading = false; this.previewUrl = null; }
+    });
+  }
+
+  closePreview() {
+    if (this.previewUrl) { try { URL.revokeObjectURL(this.previewUrl); } catch {} }
+    this.previewUrl = null;
+    this.previewDoc = null;
+    this.previewLoading = false;
   }
 }
 

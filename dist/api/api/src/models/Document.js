@@ -14,5 +14,7 @@ const DocumentSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+DocumentSchema.index({ createdAt: -1 });
+DocumentSchema.index({ category: 1, createdAt: -1 });
 module.exports = mongoose.model("Document", DocumentSchema);
 //# sourceMappingURL=Document.js.map

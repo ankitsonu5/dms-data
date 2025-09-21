@@ -8,7 +8,8 @@
     "express": "4.21.2",
     "jsonwebtoken": "9.0.2",
     "mongoose": "8.18.1",
-    "multer": "2.0.2"
+    "multer": "2.0.2",
+    "nodemailer": "7.0.6"
   },
   "main": "./main.js",
   "type": "commonjs"

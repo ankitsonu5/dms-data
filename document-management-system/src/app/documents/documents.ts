@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DocumentsService, DocumentItem } from './documents.service';
+import { CategoriesService } from '../categories/categories.service';
 
 @Component({
   selector: 'app-documents',
@@ -12,20 +13,28 @@ import { DocumentsService, DocumentItem } from './documents.service';
 })
 export class DocumentsComponent implements OnInit {
   docs: DocumentItem[] = [];
+  categories: string[] = [];
   title = '';
   description = '';
+  category = '';
   file: File | null = null;
 
   // inline edit state
   editingId: string | null = null;
   editTitle = '';
   editDescription = '';
+  editCategory = '';
   editFile: File | null = null;
 
-  constructor(public svc: DocumentsService) {}
+  constructor(public svc: DocumentsService, private cats: CategoriesService) {}
 
   ngOnInit(): void {
+    this.loadCategories();
     this.refresh();
+  }
+
+  loadCategories() {
+    this.cats.list().subscribe(list => this.categories = list.map(x => x.name));
   }
 
   refresh() {
@@ -39,9 +48,10 @@ export class DocumentsComponent implements OnInit {
 
   onUpload() {
     if (!this.file || !this.title) return;
-    this.svc.upload({ title: this.title, description: this.description, file: this.file }).subscribe(() => {
+    this.svc.upload({ title: this.title, description: this.description, category: this.category, file: this.file }).subscribe(() => {
       this.title = '';
       this.description = '';
+      this.category = '';
       this.file = null;
       this.refresh();
     });
@@ -51,12 +61,14 @@ export class DocumentsComponent implements OnInit {
     this.editingId = d._id;
     this.editTitle = d.title;
     this.editDescription = d.description || '';
+    this.editCategory = d.category || '';
   }
 
   cancelEdit() {
     this.editingId = null;
     this.editTitle = '';
     this.editDescription = '';
+    this.editCategory = '';
     this.editFile = null;
   }
 
@@ -66,9 +78,10 @@ export class DocumentsComponent implements OnInit {
   }
 
   saveEdit(d: DocumentItem) {
-    const body: Partial<Pick<DocumentItem, 'title' | 'description'>> = {
+    const body: Partial<Pick<DocumentItem, 'title' | 'description' | 'category'>> = {
       title: this.editTitle,
       description: this.editDescription,
+      category: this.editCategory,
     };
     this.svc.update(d._id, body, this.editFile || undefined).subscribe((updated) => {
       const idx = this.docs.findIndex((x) => x._id === d._id);

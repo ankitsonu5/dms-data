@@ -30,17 +30,32 @@ function fileFilter(_req, file, cb) {
     cb(new Error("Unsupported file type"), false);
 }
 const upload = multer({ storage, fileFilter, limits: { fileSize: 25 * 1024 * 1024 } });
-router.get("/", auth, async (_req, res) => {
-  const docs = await Document.find().sort({ createdAt: -1 });
+router.get("/", auth, async (req, res) => {
+  const { category, from, to } = req.query || {};
+  const filter = {};
+  if (category)
+    filter.category = String(category);
+  if (from || to) {
+    filter.createdAt = {};
+    if (from)
+      filter.createdAt.$gte = new Date(String(from));
+    if (to) {
+      const end = new Date(String(to));
+      end.setHours(23, 59, 59, 999);
+      filter.createdAt.$lte = end;
+    }
+  }
+  const docs = await Document.find(filter).sort({ createdAt: -1 });
   res.json(docs);
 });
 router.post("/", auth, upload.single("file"), async (req, res) => {
-  const { title, description } = req.body;
+  const { title, description, category } = req.body;
   if (!req.file)
     return res.status(400).json({ error: "File is required" });
   const doc = await Document.create({
     title,
     description,
+    category,
     fileName: req.file.originalname,
     mimeType: req.file.mimetype,
     size: req.file.size,
@@ -51,7 +66,7 @@ router.post("/", auth, upload.single("file"), async (req, res) => {
 });
 router.put("/:id", auth, upload.single("file"), async (req, res) => {
   const { id } = req.params;
-  const { title, description } = req.body;
+  const { title, description, category } = req.body;
   const doc = await Document.findById(id);
   if (!doc)
     return res.status(404).json({ error: "Not found" });
@@ -59,6 +74,8 @@ router.put("/:id", auth, upload.single("file"), async (req, res) => {
     doc.title = title;
   if (typeof description !== "undefined")
     doc.description = description;
+  if (typeof category !== "undefined")
+    doc.category = category;
   if (req.file) {
     try {
       fs.unlinkSync(path.join(uploadsDir, doc.path));

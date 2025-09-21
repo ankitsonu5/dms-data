@@ -1,0 +1,39 @@
+<div class="p-6 max-w-6xl mx-auto">
+  <div class="flex flex-wrap gap-3 items-end mb-6">
+    <div>
+      <label class="block text-sm mb-1">Category</label>
+      <select [(ngModel)]="category" class="border rounded px-3 py-2">
+        <option value="">All categories</option>
+        <option *ngFor="let c of categories" [value]="c">{{ c }}</option>
+      </select>
+    </div>
+    <div>
+      <label class="block text-sm mb-1">From</label>
+      <input [(ngModel)]="from" type="date" class="border rounded px-3 py-2" />
+    </div>
+    <div>
+      <label class="block text-sm mb-1">To</label>
+      <input [(ngModel)]="to" type="date" class="border rounded px-3 py-2" />
+    </div>
+    <div class="flex gap-2">
+      <button (click)="search()" class="bg-indigo-600 text-white px-4 py-2 rounded">Search</button>
+      <button (click)="clear()" class="border px-4 py-2 rounded">Clear</button>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="text-sm text-gray-600 mb-4">Loading</div>
+
+  <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div *ngFor="let d of docs" class="border rounded p-3 bg-white/70">
+      <div class="font-medium">{{ d.title }}</div>
+      <div class="text-sm text-gray-600 truncate">{{ d.fileName }}</div>
+      <div class="text-xs text-gray-500">{{ d.mimeType }}  {{ d.size | number }} bytes</div>
+      <div class="text-xs text-gray-500" *ngIf="d.category">Category: <span class="font-medium">{{ d.category }}</span></div>
+      <div class="text-xs text-gray-500">Uploaded: {{ d.createdAt | date:'medium' }}</div>
+      <div class="mt-2 flex gap-3 text-sm">
+        <button (click)="onDownload(d)" class="text-indigo-600">Download</button>
+      </div>
+    </div>
+  </div>
+</div>
+

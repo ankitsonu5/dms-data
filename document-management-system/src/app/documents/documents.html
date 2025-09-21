@@ -1,7 +1,7 @@
 <div class="p-6 max-w-5xl mx-auto">
   <h1 class="text-2xl font-semibold mb-4">Documents</h1>
 
-  <form class="grid gap-3 md:grid-cols-3 items-end mb-6" (ngSubmit)="onUpload()" #f="ngForm">
+  <form class="grid gap-3 md:grid-cols-4 items-end mb-6" (ngSubmit)="onUpload()" #f="ngForm">
     <div class="md:col-span-1">
       <label class="block text-sm mb-1">Title</label>
       <input name="title" [(ngModel)]="title" required class="w-full border rounded px-3 py-2" placeholder="Document title" />
@@ -11,10 +11,17 @@
       <input name="description" [(ngModel)]="description" class="w-full border rounded px-3 py-2" placeholder="Optional" />
     </div>
     <div class="md:col-span-1">
+      <label class="block text-sm mb-1">Category</label>
+      <select name="category" [(ngModel)]="category" class="w-full border rounded px-3 py-2">
+        <option value="">Select category</option>
+        <option *ngFor="let c of categories" [value]="c">{{ c }}</option>
+      </select>
+    </div>
+    <div class="md:col-span-1">
       <label class="block text-sm mb-1">File</label>
       <input type="file" (change)="onFile($event)" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" class="w-full" />
     </div>
-    <div class="md:col-span-3">
+    <div class="md:col-span-4">
       <button class="bg-indigo-600 text-white px-4 py-2 rounded" [disabled]="!title || !file">Upload</button>
     </div>
   </form>
@@ -25,6 +32,7 @@
         <div class="font-medium">{{ d.title }}</div>
         <div class="text-sm text-gray-600 truncate">{{ d.fileName }}</div>
         <div class="text-xs text-gray-500">{{ d.mimeType }} • {{ d.size | number }} bytes</div>
+        <div class="text-xs text-gray-500" *ngIf="d.category">Category: <span class="font-medium">{{ d.category }}</span></div>
         <div class="mt-2 flex gap-3 text-sm">
           <button (click)="onDownload(d)" class="text-indigo-600">Download</button>
           <button (click)="startEdit(d)" class="text-gray-700">Edit</button>
@@ -36,6 +44,10 @@
           <input [(ngModel)]="editTitle" class="w-full border rounded px-3 py-2" placeholder="Title" />
           <input [(ngModel)]="editDescription" class="w-full border rounded px-3 py-2" placeholder="Description (optional)" />
           <input type="file" (change)="onEditFile($event)" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" />
+          <select [(ngModel)]="editCategory" class="w-full border rounded px-3 py-2">
+            <option value="">Select category</option>
+            <option *ngFor="let c of categories" [value]="c">{{ c }}</option>
+          </select>
           <div class="flex gap-2">
             <button (click)="saveEdit(d)" class="bg-indigo-600 text-white px-3 py-1 rounded">Save</button>
             <button (click)="cancelEdit()" class="px-3 py-1 rounded border">Cancel</button>

@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["document-management-system/src/app/auth/login.scss"],
-  "sourcesContent": [".ng-invalid.ng-touched { border-color: #f87171; }\n\n"],
-  "mappings": ";AAAA,CAAA,UAAA,CAAA;AAAyB,gBAAA;;",
-  "names": []
-}

@@ -5,12 +5,23 @@ import { authGuard } from './auth/auth.guard';
 import { DocumentsComponent } from './documents/documents';
 import { UsersComponent } from './users/users';
 import { SettingsComponent } from './settings/settings';
+import { DocumentsViewComponent } from './documents-view/documents-view';
+import { CategoriesComponent } from './categories/categories';
 
 export const appRoutes: Route[] = [
   { path: 'login', component: LoginComponent },
-  { path: 'admin', component: AdminComponent, canActivate: [authGuard] },
-  { path: 'documents', component: DocumentsComponent, canActivate: [authGuard] },
-  { path: 'users', component: UsersComponent, canActivate: [authGuard] },
-  { path: 'settings', component: SettingsComponent, canActivate: [authGuard] },
-  { path: '', pathMatch: 'full', redirectTo: 'admin' },
+  {
+    path: '',
+    component: AdminComponent,
+    canActivate: [authGuard],
+    children: [
+      { path: 'documents', component: DocumentsViewComponent },
+      { path: 'documents/upload', component: DocumentsComponent },
+      { path: 'users', component: UsersComponent },
+      { path: 'settings', component: SettingsComponent },
+      { path: 'categories', component: CategoriesComponent },
+      { path: '', pathMatch: 'full', redirectTo: 'documents' },
+    ],
+  },
+  { path: '**', redirectTo: '' },
 ];

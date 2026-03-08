@@ -23,11 +23,12 @@ export class CategoriesService {
   }
 
   update(id: string, name: string): Observable<CategoryItem> {
-    return this.http.put<CategoryItem>(`${this.api}/categories/${id}`, { name });
+    return this.http.put<CategoryItem>(`${this.api}/categories/${id}`, {
+      name,
+    });
   }
 
   remove(id: string): Observable<{ ok: boolean }> {
     return this.http.delete<{ ok: boolean }>(`${this.api}/categories/${id}`);
   }
 }
-

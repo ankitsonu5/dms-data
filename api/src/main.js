@@ -35,7 +35,10 @@ async function start() {
   app.use(express.json());
   app.use(
     cors({
-      origin: [/^http:\/\/localhost(?::\d+)?$/, /^http:\/\/127\.0\.0\.1(?::\d+)?$/],
+      origin: [
+        /^http:\/\/localhost(?::\d+)?$/,
+        /^http:\/\/127\.0\.0\.1(?::\d+)?$/,
+      ],
       credentials: false,
     })
   );
@@ -47,8 +50,10 @@ async function start() {
   app.get('/stats', auth, async (_req, res) => {
     const Document = require('./models/Document');
     const Admin = require('./models/Admin');
-    const start = new Date(); start.setHours(0, 0, 0, 0);
-    const end = new Date(); end.setHours(23, 59, 59, 999);
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+    const end = new Date();
+    end.setHours(23, 59, 59, 999);
     const [documentsTotal, documentsToday, usersTotal] = await Promise.all([
       Document.countDocuments({}),
       Document.countDocuments({ createdAt: { $gte: start, $lte: end } }),
@@ -71,4 +76,3 @@ async function start() {
 }
 
 start();
-

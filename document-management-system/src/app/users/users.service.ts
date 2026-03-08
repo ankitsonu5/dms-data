@@ -17,13 +17,20 @@ export class UsersService {
 
   list(): Observable<AdminUser[]> {
     return this.http.get<AdminUser[]>(`${this.api}/users`);
-    }
+  }
 
-  create(payload: { email: string; password: string; role?: string }): Observable<AdminUser> {
+  create(payload: {
+    email: string;
+    password: string;
+    role?: string;
+  }): Observable<AdminUser> {
     return this.http.post<AdminUser>(`${this.api}/users`, payload);
   }
 
-  update(id: string, payload: { email?: string; password?: string; role?: string }): Observable<AdminUser> {
+  update(
+    id: string,
+    payload: { email?: string; password?: string; role?: string }
+  ): Observable<AdminUser> {
     return this.http.put<AdminUser>(`${this.api}/users/${id}`, payload);
   }
 
@@ -31,4 +38,3 @@ export class UsersService {
     return this.http.delete<{ ok: boolean }>(`${this.api}/users/${id}`);
   }
 }
-

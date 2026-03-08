@@ -35,7 +35,11 @@ function fileFilter(_req, file, cb) {
   else cb(new Error('Unsupported file type'), false);
 }
 
-const upload = multer({ storage, fileFilter, limits: { fileSize: 25 * 1024 * 1024 } });
+const upload = multer({
+  storage,
+  fileFilter,
+  limits: { fileSize: 25 * 1024 * 1024 },
+});
 
 // List with optional filters and pagination:
 // ?category=..&from=YYYY-MM-DD&to=YYYY-MM-DD&sortBy=createdAt|title|category&sortDir=asc|desc&page=1&limit=20
@@ -63,12 +67,19 @@ router.get('/', auth, async (req, res) => {
   const sort = { [sortBy]: sortDir };
 
   // Pagination (only apply if both page and limit are provided)
-  const page = req.query.page ? Math.max(parseInt(String(req.query.page), 10) || 1, 1) : null;
-  const limit = req.query.limit ? Math.max(parseInt(String(req.query.limit), 10) || 1, 1) : null;
+  const page = req.query.page
+    ? Math.max(parseInt(String(req.query.page), 10) || 1, 1)
+    : null;
+  const limit = req.query.limit
+    ? Math.max(parseInt(String(req.query.limit), 10) || 1, 1)
+    : null;
 
   if (page && limit) {
     const total = await Document.countDocuments(filter);
-    const items = await Document.find(filter).sort(sort).skip((page - 1) * limit).limit(limit);
+    const items = await Document.find(filter)
+      .sort(sort)
+      .skip((page - 1) * limit)
+      .limit(limit);
     res.set('X-Total-Count', String(total));
     return res.json(items);
   }
@@ -108,7 +119,9 @@ router.put('/:id', auth, upload.single('file'), async (req, res) => {
   if (typeof category !== 'undefined') doc.category = category;
 
   if (req.file) {
-    try { fs.unlinkSync(path.join(uploadsDir, doc.path)); } catch {}
+    try {
+      fs.unlinkSync(path.join(uploadsDir, doc.path));
+    } catch {}
     doc.fileName = req.file.originalname;
     doc.mimeType = req.file.mimetype;
     doc.size = req.file.size;
@@ -125,7 +138,9 @@ router.delete('/:id', auth, async (req, res) => {
   const doc = await Document.findByIdAndDelete(id);
   if (!doc) return res.status(404).json({ error: 'Not found' });
   // remove file best-effort
-  try { fs.unlinkSync(path.join(uploadsDir, doc.path)); } catch {}
+  try {
+    fs.unlinkSync(path.join(uploadsDir, doc.path));
+  } catch {}
   res.json({ ok: true });
 });
 
@@ -135,11 +150,14 @@ router.get('/:id/file', auth, async (req, res) => {
   const doc = await Document.findById(id);
   if (!doc) return res.status(404).json({ error: 'Not found' });
   const filePath = path.join(uploadsDir, doc.path);
-  if (!fs.existsSync(filePath)) return res.status(404).json({ error: 'File missing' });
+  if (!fs.existsSync(filePath))
+    return res.status(404).json({ error: 'File missing' });
   res.setHeader('Content-Type', doc.mimeType);
-  res.setHeader('Content-Disposition', `inline; filename="${doc.fileName.replace(/"/g, '')}"`);
+  res.setHeader(
+    'Content-Disposition',
+    `inline; filename="${doc.fileName.replace(/"/g, '')}"`
+  );
   fs.createReadStream(filePath).pipe(res);
 });
 
 module.exports = router;
-

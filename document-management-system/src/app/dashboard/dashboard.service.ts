@@ -16,4 +16,3 @@ export class DashboardService {
     return this.http.get<DashboardStats>(`${this.api}/stats`);
   }
 }
-

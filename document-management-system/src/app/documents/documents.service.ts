@@ -25,17 +25,31 @@ export class DocumentsService {
     return this.http.get<DocumentItem[]>(`${this.api}/documents`);
   }
 
-  search(params: { category?: string; from?: string; to?: string }): Observable<DocumentItem[]> {
+  search(params: {
+    category?: string;
+    from?: string;
+    to?: string;
+  }): Observable<DocumentItem[]> {
     const query = new URLSearchParams();
     if (params.category) query.set('category', params.category);
     if (params.from) query.set('from', params.from);
     if (params.to) query.set('to', params.to);
     const qs = query.toString();
-    return this.http.get<DocumentItem[]>(`${this.api}/documents${qs ? '?' + qs : ''}`);
+    return this.http.get<DocumentItem[]>(
+      `${this.api}/documents${qs ? '?' + qs : ''}`
+    );
   }
 
   // Server-side paged search; returns items and total from X-Total-Count header
-  searchPaged(params: { category?: string; from?: string; to?: string; page: number; limit: number; sortBy?: 'createdAt'|'title'|'category'; sortDir?: 'asc'|'desc'; }): Observable<{ items: DocumentItem[]; total: number; }>{
+  searchPaged(params: {
+    category?: string;
+    from?: string;
+    to?: string;
+    page: number;
+    limit: number;
+    sortBy?: 'createdAt' | 'title' | 'category';
+    sortDir?: 'asc' | 'desc';
+  }): Observable<{ items: DocumentItem[]; total: number }> {
     const query = new URLSearchParams();
     if (params.category) query.set('category', params.category);
     if (params.from) query.set('from', params.from);
@@ -59,7 +73,12 @@ export class DocumentsService {
     });
   }
 
-  upload(payload: { title: string; description?: string; category?: string; file: File }): Observable<DocumentItem> {
+  upload(payload: {
+    title: string;
+    description?: string;
+    category?: string;
+    file: File;
+  }): Observable<DocumentItem> {
     const form = new FormData();
     form.append('title', payload.title);
     if (payload.description) form.append('description', payload.description);
@@ -68,12 +87,18 @@ export class DocumentsService {
     return this.http.post<DocumentItem>(`${this.api}/documents`, form);
   }
 
-  update(id: string, body: Partial<Pick<DocumentItem, 'title' | 'description' | 'category'>>, file?: File): Observable<DocumentItem> {
+  update(
+    id: string,
+    body: Partial<Pick<DocumentItem, 'title' | 'description' | 'category'>>,
+    file?: File
+  ): Observable<DocumentItem> {
     if (file) {
       const form = new FormData();
       if (body.title) form.append('title', body.title);
-      if (typeof body.description !== 'undefined') form.append('description', body.description ?? '');
-      if (typeof body.category !== 'undefined') form.append('category', body.category ?? '');
+      if (typeof body.description !== 'undefined')
+        form.append('description', body.description ?? '');
+      if (typeof body.category !== 'undefined')
+        form.append('category', body.category ?? '');
       form.append('file', file);
       return this.http.put<DocumentItem>(`${this.api}/documents/${id}`, form);
     }
@@ -81,7 +106,9 @@ export class DocumentsService {
   }
 
   download(id: string): Observable<Blob> {
-    return this.http.get(`${this.api}/documents/${id}/file`, { responseType: 'blob' }) as unknown as Observable<Blob>;
+    return this.http.get(`${this.api}/documents/${id}/file`, {
+      responseType: 'blob',
+    }) as unknown as Observable<Blob>;
   }
 
   remove(id: string): Observable<{ ok: boolean }> {
@@ -92,4 +119,3 @@ export class DocumentsService {
     return `${this.api}/documents/${doc._id}/file`;
   }
 }
-

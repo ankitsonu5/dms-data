@@ -20,7 +20,9 @@ router.post('/login', async (req, res) => {
     if (!email || !password) {
       return res.status(400).json({ error: 'Email and password are required' });
     }
-    const admin = await Admin.findOne({ email: String(email).toLowerCase().trim() });
+    const admin = await Admin.findOne({
+      email: String(email).toLowerCase().trim(),
+    });
     if (!admin) return res.status(401).json({ error: 'Invalid credentials' });
 
     const ok = await bcrypt.compare(password, admin.passwordHash);
@@ -39,7 +41,10 @@ router.get('/me', (req, res) => {
     const auth = req.headers.authorization || '';
     const token = auth.startsWith('Bearer ') ? auth.slice(7) : null;
     if (!token) return res.status(401).json({ error: 'Missing token' });
-    const payload = jwt.verify(token, process.env.JWT_SECRET || 'dev-secret-change-me');
+    const payload = jwt.verify(
+      token,
+      process.env.JWT_SECRET || 'dev-secret-change-me'
+    );
     return res.json({ user: { email: payload.email, role: payload.role } });
   } catch (err) {
     return res.status(401).json({ error: 'Invalid token' });
@@ -50,15 +55,21 @@ router.get('/me', (req, res) => {
 router.post('/forgot', async (req, res) => {
   const { email } = req.body || {};
   if (!email) return res.status(400).json({ error: 'email is required' });
-  const admin = await Admin.findOne({ email: String(email).toLowerCase().trim() });
+  const admin = await Admin.findOne({
+    email: String(email).toLowerCase().trim(),
+  });
   // Always respond ok to avoid email enumeration
   if (!admin) return res.json({ ok: true });
 
   const secret = process.env.JWT_SECRET || 'dev-secret-change-me';
-  const token = jwt.sign({ sub: String(admin._id), type: 'reset', email: admin.email }, secret, {
-    algorithm: 'HS256',
-    expiresIn: '1h',
-  });
+  const token = jwt.sign(
+    { sub: String(admin._id), type: 'reset', email: admin.email },
+    secret,
+    {
+      algorithm: 'HS256',
+      expiresIn: '1h',
+    }
+  );
 
   const host = process.env.SMTP_HOST;
   const user = process.env.SMTP_USER;
@@ -69,9 +80,18 @@ router.post('/forgot', async (req, res) => {
 
   if (host && user && pass && from) {
     try {
-      const transporter = nodemailer.createTransport({ host, port, secure, auth: { user, pass } });
-      const web = process.env.WEB_URL ? String(process.env.WEB_URL).replace(/\/$/, '') : '';
-      const link = web ? `${web}/reset?token=${encodeURIComponent(token)}` : null;
+      const transporter = nodemailer.createTransport({
+        host,
+        port,
+        secure,
+        auth: { user, pass },
+      });
+      const web = process.env.WEB_URL
+        ? String(process.env.WEB_URL).replace(/\/$/, '')
+        : '';
+      const link = web
+        ? `${web}/reset?token=${encodeURIComponent(token)}`
+        : null;
       const text = link
         ? `You requested a password reset. Click this link to reset your password: ${link}\nIf you did not request this, you can ignore this email.`
         : `Use this password reset token: ${token}`;
@@ -96,11 +116,13 @@ router.post('/forgot', async (req, res) => {
 // Reset password using token
 router.post('/reset', async (req, res) => {
   const { token, password } = req.body || {};
-  if (!token || !password) return res.status(400).json({ error: 'token and password are required' });
+  if (!token || !password)
+    return res.status(400).json({ error: 'token and password are required' });
   try {
     const secret = process.env.JWT_SECRET || 'dev-secret-change-me';
     const payload = jwt.verify(token, secret);
-    if (payload.type !== 'reset') return res.status(400).json({ error: 'invalid token type' });
+    if (payload.type !== 'reset')
+      return res.status(400).json({ error: 'invalid token type' });
     const admin = await Admin.findById(payload.sub);
     if (!admin) return res.status(404).json({ error: 'user not found' });
     const bcrypt = require('bcryptjs');
@@ -113,4 +135,3 @@ router.post('/reset', async (req, res) => {
 });
 
 module.exports = router;
-

@@ -35,7 +35,9 @@ export class DocumentsComponent implements OnInit {
   }
 
   loadCategories() {
-    this.cats.list().subscribe(list => this.categories = list.map(x => x.name));
+    this.cats
+      .list()
+      .subscribe((list) => (this.categories = list.map((x) => x.name)));
   }
 
   refresh() {
@@ -56,7 +58,10 @@ export class DocumentsComponent implements OnInit {
   onDrop(e: DragEvent) {
     e.preventDefault();
     e.stopPropagation();
-    const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0] ? e.dataTransfer.files[0] : null;
+    const f =
+      e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]
+        ? e.dataTransfer.files[0]
+        : null;
     if (f) {
       this.file = f;
       this.title = f.name;
@@ -69,13 +74,20 @@ export class DocumentsComponent implements OnInit {
 
   onUpload() {
     if (!this.file || !this.title) return;
-    this.svc.upload({ title: this.title, description: this.description, category: this.category, file: this.file }).subscribe(() => {
-      this.title = '';
-      this.description = '';
-      this.category = '';
-      this.file = null;
-      this.refresh();
-    });
+    this.svc
+      .upload({
+        title: this.title,
+        description: this.description,
+        category: this.category,
+        file: this.file,
+      })
+      .subscribe(() => {
+        this.title = '';
+        this.description = '';
+        this.category = '';
+        this.file = null;
+        this.refresh();
+      });
   }
 
   startEdit(d: DocumentItem) {
@@ -99,16 +111,20 @@ export class DocumentsComponent implements OnInit {
   }
 
   saveEdit(d: DocumentItem) {
-    const body: Partial<Pick<DocumentItem, 'title' | 'description' | 'category'>> = {
+    const body: Partial<
+      Pick<DocumentItem, 'title' | 'description' | 'category'>
+    > = {
       title: this.editTitle,
       description: this.editDescription,
       category: this.editCategory,
     };
-    this.svc.update(d._id, body, this.editFile || undefined).subscribe((updated) => {
-      const idx = this.docs.findIndex((x) => x._id === d._id);
-      if (idx >= 0) this.docs[idx] = updated;
-      this.cancelEdit();
-    });
+    this.svc
+      .update(d._id, body, this.editFile || undefined)
+      .subscribe((updated) => {
+        const idx = this.docs.findIndex((x) => x._id === d._id);
+        if (idx >= 0) this.docs[idx] = updated;
+        this.cancelEdit();
+      });
   }
 
   onDownload(d: DocumentItem) {
@@ -136,19 +152,29 @@ export class DocumentsComponent implements OnInit {
     this.previewLoading = true;
     this.svc.download(d._id).subscribe({
       next: (blob: Blob) => {
-        if (this.previewUrl) { try { URL.revokeObjectURL(this.previewUrl); } catch {} }
+        if (this.previewUrl) {
+          try {
+            URL.revokeObjectURL(this.previewUrl);
+          } catch {}
+        }
         this.previewUrl = URL.createObjectURL(blob);
         this.previewLoading = false;
       },
-      error: () => { this.previewLoading = false; this.previewUrl = null; }
+      error: () => {
+        this.previewLoading = false;
+        this.previewUrl = null;
+      },
     });
   }
 
   closePreview() {
-    if (this.previewUrl) { try { URL.revokeObjectURL(this.previewUrl); } catch {} }
+    if (this.previewUrl) {
+      try {
+        URL.revokeObjectURL(this.previewUrl);
+      } catch {}
+    }
     this.previewUrl = null;
     this.previewDoc = null;
     this.previewLoading = false;
   }
 }
-

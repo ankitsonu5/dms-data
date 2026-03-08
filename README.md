@@ -4,7 +4,7 @@ Yeh repository Nx monorepo par based hai, jismein Angular 20+ (no SSR) frontend 
 
 ## High-level Structure
 
-````text
+```text
 ./
 ├─ api/                                 # Node.js (Express) backend app
 ├─ document-management-system/          # Angular 20+ frontend app (no SSR)
@@ -16,13 +16,13 @@ Yeh repository Nx monorepo par based hai, jismein Angular 20+ (no SSR) frontend 
 ├─ tsconfig.base.json                   # Base TypeScript config for workspace
 ├─ eslint.config.mjs, jest.config.ts... # Root lint/test configs
 └─ README.md                            # Yeh file (documentation)
-````
+```
 
 ## Frontend: document-management-system (Angular 20+, no SSR)
 
 Path: `document-management-system/`
 
-````text
+```text
 document-management-system/
 ├─ project.json                # Nx project config for Angular app
 ├─ eslint.config.mjs           # Lint config (project-level)
@@ -53,14 +53,16 @@ document-management-system/
          │  └─ truncate-pipe.ts# Example truncate pipe (standalone)
          └─ directives/
             └─ autofocus.ts    # Example directive (standalone)
-````
+```
 
 Notes:
+
 - Angular app NgModules use karta hai (standalone=false for App/Toolbar), taki SharedModule properly ban sake.
 - `truncate` pipe aur `autofocus` directive standalone generate kiye gaye hain; SharedModule mein inhe `imports` aur `exports` dono mei include kiya gaya hai (kyonki standalone declarations ko NgModule me declare nahi karte, import karte hain).
 - SSR disabled hai (no server-side rendering). Bundler: esbuild.
 
 ### SharedModule ka structure
+
 - File: `document-management-system/src/app/shared/shared.module.ts`
 - Purpose: Common Angular modules (e.g. `CommonModule`) aur shared building blocks ko aggregate karke export karna.
 - Abhi export karta hai: `CommonModule`, `Toolbar` component, `TruncatePipe` (standalone import/export), `Autofocus` (standalone import/export).
@@ -69,7 +71,7 @@ Notes:
 
 Path: `api/`
 
-````text
+```text
 api/
 ├─ project.json                # Nx project config for Node app
 ├─ eslint.config.mjs
@@ -77,8 +79,7 @@ api/
 └─ src/
    ├─ main.ts                  # Express server entry (port/config yahin set hota hai)
    └─ assets/                  # Static assets (if any)
-````
-
+```
 
 ## Build Outputs
 
@@ -93,7 +94,7 @@ api/
 
 ## NPM Scripts (package.json)
 
-````json
+```json
 {
   "scripts": {
     "dev": "concurrently \"nx serve document-management-system\" \"nx serve api\"",
@@ -104,7 +105,7 @@ api/
     "test": "echo \"No tests configured\""
   }
 }
-````
+```
 
 ## Common Workflows
 
@@ -125,4 +126,3 @@ api/
 - Workspace-level shared libraries ke liye Nx `libs/` generate kar sakta hai (agar aap shared utilities ko alag package banana chahte hain).
 
 Agar aap chahen to main proxy config (Angular → API) add karke local API calls ko simplify kar sakta hoon, aur Nx welcome screen hata kar initial layout/pages scaffold kar sakta hoon.
-

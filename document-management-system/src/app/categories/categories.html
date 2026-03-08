@@ -4,13 +4,21 @@
   <form class="flex gap-3 items-end mb-6" (ngSubmit)="add()">
     <div class="flex-1">
       <label class="block text-sm mb-1">New category</label>
-      <input [(ngModel)]="name" name="name" class="w-full border rounded px-3 py-2" placeholder="e.g. HR, Finance" />
+      <input
+        [(ngModel)]="name"
+        name="name"
+        class="w-full border rounded px-3 py-2"
+        placeholder="e.g. HR, Finance"
+      />
     </div>
     <button class="bg-indigo-600 text-white px-4 py-2 rounded">Add</button>
   </form>
 
   <div class="border rounded divide-y bg-white">
-    <div *ngFor="let it of items" class="p-3 flex items-center gap-3 justify-between">
+    <div
+      *ngFor="let it of items"
+      class="p-3 flex items-center gap-3 justify-between"
+    >
       <ng-container *ngIf="editingId !== it._id; else editTpl">
         <div class="font-medium">{{ it.name }}</div>
         <div class="flex gap-2 text-sm">
@@ -20,14 +28,24 @@
       </ng-container>
       <ng-template #editTpl>
         <div class="flex-1">
-          <input [(ngModel)]="editName" class="w-full border rounded px-3 py-2" placeholder="Category name" />
+          <input
+            [(ngModel)]="editName"
+            class="w-full border rounded px-3 py-2"
+            placeholder="Category name"
+          />
         </div>
         <div class="flex gap-2">
-          <button class="bg-indigo-600 text-white px-3 py-1 rounded" (click)="save(it)">Save</button>
-          <button class="px-3 py-1 rounded border" (click)="cancelEdit()">Cancel</button>
+          <button
+            class="bg-indigo-600 text-white px-3 py-1 rounded"
+            (click)="save(it)"
+          >
+            Save
+          </button>
+          <button class="px-3 py-1 rounded border" (click)="cancelEdit()">
+            Cancel
+          </button>
         </div>
       </ng-template>
     </div>
   </div>
 </div>
-

@@ -8,14 +8,22 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
-  login(email: string, password: string): Observable<{ token: string; user: { email: string; role: string } }> {
+  login(
+    email: string,
+    password: string
+  ): Observable<{ token: string; user: { email: string; role: string } }> {
     return this.http
-      .post<{ token: string; user: { email: string; role: string } }>(`${this.api}/auth/login`, { email, password })
+      .post<{ token: string; user: { email: string; role: string } }>(
+        `${this.api}/auth/login`,
+        { email, password }
+      )
       .pipe(tap((res) => localStorage.setItem('token', res.token)));
   }
 
   me(): Observable<{ user: { email: string; role: string } }> {
-    return this.http.get<{ user: { email: string; role: string } }>(`${this.api}/auth/me`);
+    return this.http.get<{ user: { email: string; role: string } }>(
+      `${this.api}/auth/me`
+    );
   }
 
   logout() {
@@ -27,11 +35,15 @@ export class AuthService {
   }
 
   forgot(email: string): Observable<{ ok: boolean }> {
-    return this.http.post<{ ok: boolean }>(`${this.api}/auth/forgot`, { email });
+    return this.http.post<{ ok: boolean }>(`${this.api}/auth/forgot`, {
+      email,
+    });
   }
 
   reset(token: string, password: string): Observable<{ ok: boolean }> {
-    return this.http.post<{ ok: boolean }>(`${this.api}/auth/reset`, { token, password });
+    return this.http.post<{ ok: boolean }>(`${this.api}/auth/reset`, {
+      token,
+      password,
+    });
   }
 }
-

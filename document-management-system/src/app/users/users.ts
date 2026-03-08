@@ -21,19 +21,23 @@ export class UsersComponent implements OnInit {
 
   constructor(public svc: UsersService) {}
 
-  ngOnInit(): void { this.refresh(); }
+  ngOnInit(): void {
+    this.refresh();
+  }
 
   refresh() {
-    this.svc.list().subscribe(d => this.users = d);
+    this.svc.list().subscribe((d) => (this.users = d));
   }
 
   onCreate() {
     if (!this.email || !this.password) return;
-    this.svc.create({ email: this.email, password: this.password }).subscribe(() => {
-      this.email = '';
-      this.password = '';
-      this.refresh();
-    });
+    this.svc
+      .create({ email: this.email, password: this.password })
+      .subscribe(() => {
+        this.email = '';
+        this.password = '';
+        this.refresh();
+      });
   }
 
   start(u: AdminUser) {
@@ -50,10 +54,17 @@ export class UsersComponent implements OnInit {
 
   onSave(u: AdminUser) {
     const payload: { email?: string; password?: string } = {};
-    if (this.editEmail && this.editEmail !== u.email) payload.email = this.editEmail;
+    if (this.editEmail && this.editEmail !== u.email)
+      payload.email = this.editEmail;
     if (this.editPassword) payload.password = this.editPassword;
-    if (Object.keys(payload).length === 0) { this.cancel(); return; }
-    this.svc.update(u._id, payload).subscribe(() => { this.cancel(); this.refresh(); });
+    if (Object.keys(payload).length === 0) {
+      this.cancel();
+      return;
+    }
+    this.svc.update(u._id, payload).subscribe(() => {
+      this.cancel();
+      this.refresh();
+    });
   }
 
   onDelete(u: AdminUser) {
@@ -61,4 +72,3 @@ export class UsersComponent implements OnInit {
     this.svc.remove(u._id).subscribe(() => this.refresh());
   }
 }
-

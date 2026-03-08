@@ -17,21 +17,37 @@ export class CategoriesComponent implements OnInit {
   editName = '';
 
   constructor(private svc: CategoriesService) {}
-  ngOnInit(): void { this.refresh(); }
+  ngOnInit(): void {
+    this.refresh();
+  }
 
-  refresh() { this.svc.list().subscribe(d => this.items = d); }
+  refresh() {
+    this.svc.list().subscribe((d) => (this.items = d));
+  }
 
   add() {
     if (!this.name.trim()) return;
-    this.svc.create(this.name.trim()).subscribe(() => { this.name = ''; this.refresh(); });
+    this.svc.create(this.name.trim()).subscribe(() => {
+      this.name = '';
+      this.refresh();
+    });
   }
 
-  startEdit(it: CategoryItem) { this.editingId = it._id; this.editName = it.name; }
-  cancelEdit() { this.editingId = null; this.editName = ''; }
+  startEdit(it: CategoryItem) {
+    this.editingId = it._id;
+    this.editName = it.name;
+  }
+  cancelEdit() {
+    this.editingId = null;
+    this.editName = '';
+  }
 
   save(it: CategoryItem) {
     if (!this.editName.trim()) return;
-    this.svc.update(it._id, this.editName.trim()).subscribe(() => { this.cancelEdit(); this.refresh(); });
+    this.svc.update(it._id, this.editName.trim()).subscribe(() => {
+      this.cancelEdit();
+      this.refresh();
+    });
   }
 
   remove(it: CategoryItem) {
@@ -39,4 +55,3 @@ export class CategoriesComponent implements OnInit {
     this.svc.remove(it._id).subscribe(() => this.refresh());
   }
 }
-

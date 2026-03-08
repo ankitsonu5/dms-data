@@ -9,22 +9,30 @@ const router = express.Router();
 
 // List users (admins)
 router.get('/', auth, async (_req, res) => {
-  const items = await Admin.find({}, { passwordHash: 0 }).sort({ createdAt: -1 });
+  const items = await Admin.find({}, { passwordHash: 0 }).sort({
+    createdAt: -1,
+  });
   res.json(items);
 });
 
 // Create user
 router.post('/', auth, async (req, res) => {
   const { email, password, role } = req.body || {};
-  if (!email || !password) return res.status(400).json({ error: 'email and password are required' });
+  if (!email || !password)
+    return res.status(400).json({ error: 'email and password are required' });
   const passwordHash = await bcrypt.hash(password, 10);
   try {
-    const created = await Admin.create({ email: String(email).toLowerCase().trim(), passwordHash, role: role || 'admin' });
+    const created = await Admin.create({
+      email: String(email).toLowerCase().trim(),
+      passwordHash,
+      role: role || 'admin',
+    });
     const out = created.toObject();
     delete out.passwordHash;
     res.status(201).json(out);
   } catch (e) {
-    if (e.code === 11000) return res.status(409).json({ error: 'email already exists' });
+    if (e.code === 11000)
+      return res.status(409).json({ error: 'email already exists' });
     throw e;
   }
 });
@@ -38,7 +46,11 @@ router.put('/:id', auth, async (req, res) => {
   if (role) update.role = role;
   if (password) update.passwordHash = await bcrypt.hash(password, 10);
 
-  const updated = await Admin.findByIdAndUpdate(id, { $set: update }, { new: true, projection: { passwordHash: 0 } });
+  const updated = await Admin.findByIdAndUpdate(
+    id,
+    { $set: update },
+    { new: true, projection: { passwordHash: 0 } }
+  );
   if (!updated) return res.status(404).json({ error: 'not found' });
   res.json(updated);
 });
@@ -52,4 +64,3 @@ router.delete('/:id', auth, async (req, res) => {
 });
 
 module.exports = router;
-

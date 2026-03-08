@@ -14,12 +14,14 @@ router.get('/', auth, async (_req, res) => {
 // Create category
 router.post('/', auth, async (req, res) => {
   const { name } = req.body;
-  if (!name || !String(name).trim()) return res.status(400).json({ error: 'Name required' });
+  if (!name || !String(name).trim())
+    return res.status(400).json({ error: 'Name required' });
   try {
     const created = await Category.create({ name: String(name).trim() });
     res.status(201).json(created);
   } catch (e) {
-    if (e.code === 11000) return res.status(409).json({ error: 'Category already exists' });
+    if (e.code === 11000)
+      return res.status(409).json({ error: 'Category already exists' });
     res.status(500).json({ error: 'Failed to create category' });
   }
 });
@@ -28,7 +30,8 @@ router.post('/', auth, async (req, res) => {
 router.put('/:id', auth, async (req, res) => {
   const { id } = req.params;
   const { name } = req.body;
-  if (!name || !String(name).trim()) return res.status(400).json({ error: 'Name required' });
+  if (!name || !String(name).trim())
+    return res.status(400).json({ error: 'Name required' });
   try {
     const updated = await Category.findByIdAndUpdate(
       id,
@@ -38,7 +41,8 @@ router.put('/:id', auth, async (req, res) => {
     if (!updated) return res.status(404).json({ error: 'Not found' });
     res.json(updated);
   } catch (e) {
-    if (e.code === 11000) return res.status(409).json({ error: 'Category already exists' });
+    if (e.code === 11000)
+      return res.status(409).json({ error: 'Category already exists' });
     res.status(500).json({ error: 'Failed to update category' });
   }
 });
@@ -52,4 +56,3 @@ router.delete('/:id', auth, async (req, res) => {
 });
 
 module.exports = router;
-

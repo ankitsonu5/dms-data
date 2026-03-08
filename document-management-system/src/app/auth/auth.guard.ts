@@ -9,4 +9,3 @@ export const authGuard = () => {
   if (token) return true;
   return router.createUrlTree(['/login']);
 };
-

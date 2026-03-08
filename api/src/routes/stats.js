@@ -24,4 +24,3 @@ router.get('/', auth, async (_req, res) => {
 });
 
 module.exports = router;
-

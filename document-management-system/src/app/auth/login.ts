@@ -1,4 +1,3 @@
-
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -15,12 +14,16 @@ import { AuthService } from './auth.service';
 })
 export class LoginComponent {
   model = { email: '', password: '' };
-  loading = false; error = '';
-  showPassword = false; currentYear = new Date().getFullYear();
+  loading = false;
+  error = '';
+  showPassword = false;
+  currentYear = new Date().getFullYear();
 
   constructor(private auth: AuthService, private router: Router) {}
 
-  toggleShowPassword() { this.showPassword = !this.showPassword; }
+  toggleShowPassword() {
+    this.showPassword = !this.showPassword;
+  }
 
   login() {
     this.loading = true;
@@ -37,5 +40,3 @@ export class LoginComponent {
     });
   }
 }
-
-

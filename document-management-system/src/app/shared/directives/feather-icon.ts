@@ -10,8 +10,10 @@ export class FeatherIcon implements OnChanges {
 
   ngOnChanges(): void {
     const name = (this.featherIcon || '').trim();
-    const svg = (feather as any).icons?.[name]?.toSvg({ class: 'inline-block align-middle' }) || '';
+    const svg =
+      (feather as any).icons?.[name]?.toSvg({
+        class: 'inline-block align-middle',
+      }) || '';
     this.el.nativeElement.innerHTML = svg;
   }
 }
-

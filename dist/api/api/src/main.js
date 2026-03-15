@@ -28,7 +28,7 @@ async function start() {
   app.use(express.json());
   app.use(
     cors({
-      origin: [/^http:\/\/localhost(?::\d+)?$/, /^http:\/\/127\.0\.0\.1(?::\d+)?$/],
+      origin: [/^http:\/\/localhost(?::\d+)?$/, /^http:\/\/127\.0\.0\.1(?::\d+)?$/, /^http:\/\/dms-vns-01\.protoninternet\.com(?::\d+)?$/],
       credentials: false
     })
   );

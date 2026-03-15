@@ -38,6 +38,7 @@ async function start() {
       origin: [
         /^http:\/\/localhost(?::\d+)?$/,
         /^http:\/\/127\.0\.0\.1(?::\d+)?$/,
+        /^http:\/\/dms-vns-01\.protoninternet\.com(?::\d+)?$/,
       ],
       credentials: false,
     })

@@ -12,7 +12,11 @@ function auth(req, res, next) {
     req.user = payload;
     next();
   } catch (e) {
-    if (e && typeof e.message === 'string' && e.message.includes('JWT_SECRET')) {
+    if (
+      e &&
+      typeof e.message === 'string' &&
+      e.message.includes('JWT_SECRET')
+    ) {
       return res
         .status(500)
         .json({ error: 'Server auth configuration is invalid' });

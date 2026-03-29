@@ -12,7 +12,7 @@ export interface AdminUser {
 
 @Injectable({ providedIn: 'root' })
 export class UsersService {
-  private api = 'http://localhost:3000';
+  private api = '';
   constructor(private http: HttpClient) {}
 
   list(): Observable<AdminUser[]> {

@@ -11,7 +11,7 @@ export interface CategoryItem {
 
 @Injectable({ providedIn: 'root' })
 export class CategoriesService {
-  private api = 'http://localhost:3000';
+  private api = '';
   constructor(private http: HttpClient) {}
 
   list(): Observable<CategoryItem[]> {

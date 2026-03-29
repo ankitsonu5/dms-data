@@ -45,8 +45,14 @@ router.get('/me', (req, res) => {
     const payload = jwt.verify(token, getJwtSecret());
     return res.json({ user: { email: payload.email, role: payload.role } });
   } catch (err) {
-    if (err && typeof err.message === 'string' && err.message.includes('JWT_SECRET')) {
-      return res.status(500).json({ error: 'Server auth configuration is invalid' });
+    if (
+      err &&
+      typeof err.message === 'string' &&
+      err.message.includes('JWT_SECRET')
+    ) {
+      return res
+        .status(500)
+        .json({ error: 'Server auth configuration is invalid' });
     }
     return res.status(401).json({ error: 'Invalid token' });
   }

@@ -10,7 +10,7 @@ export interface DashboardStats {
 
 @Injectable({ providedIn: 'root' })
 export class DashboardService {
-  private api = 'http://localhost:3000';
+  private api = '';
   constructor(private http: HttpClient) {}
   getStats(): Observable<DashboardStats> {
     return this.http.get<DashboardStats>(`${this.api}/stats`);

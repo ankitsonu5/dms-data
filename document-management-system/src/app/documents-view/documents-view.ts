@@ -32,10 +32,7 @@ export class DocumentsViewComponent implements OnInit {
   selected = new Set<string>();
   moveCategory = '';
 
-  constructor(
-    private svc: DocumentsService,
-    private cats: CategoriesService
-  ) {}
+  constructor(private svc: DocumentsService, private cats: CategoriesService) {}
 
   ngOnInit(): void {
     this.loadCategories();

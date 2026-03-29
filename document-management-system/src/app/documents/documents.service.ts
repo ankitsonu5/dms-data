@@ -17,7 +17,7 @@ export interface DocumentItem {
 
 @Injectable({ providedIn: 'root' })
 export class DocumentsService {
-  private api = 'http://localhost:3000';
+  private api = '';
 
   constructor(private http: HttpClient) {}
 

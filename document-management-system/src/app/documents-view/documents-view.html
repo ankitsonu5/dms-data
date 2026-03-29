@@ -219,11 +219,11 @@
             />
           </ng-container>
           <ng-template #fileFrame>
-            <iframe
-              [src]="trustedPreviewUrl"
+            <object
+              [attr.data]="previewUrl"
+              type="application/pdf"
               class="w-[90vw] max-w-5xl h-[80vh]"
-              frameborder="0"
-            ></iframe>
+            ></object>
           </ng-template>
         </ng-container>
       </div>

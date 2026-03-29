@@ -5,11 +5,12 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const Admin = require('../models/Admin');
+const { getJwtSecret } = require('../config/jwt');
 
 const router = express.Router();
 
 function signToken(admin) {
-  const secret = process.env.JWT_SECRET || 'dev-secret-change-me';
+  const secret = getJwtSecret();
   const payload = { sub: String(admin._id), role: 'admin', email: admin.email };
   return jwt.sign(payload, secret, { algorithm: 'HS256', expiresIn: '1d' });
 }
@@ -41,12 +42,12 @@ router.get('/me', (req, res) => {
     const auth = req.headers.authorization || '';
     const token = auth.startsWith('Bearer ') ? auth.slice(7) : null;
     if (!token) return res.status(401).json({ error: 'Missing token' });
-    const payload = jwt.verify(
-      token,
-      process.env.JWT_SECRET || 'dev-secret-change-me'
-    );
+    const payload = jwt.verify(token, getJwtSecret());
     return res.json({ user: { email: payload.email, role: payload.role } });
   } catch (err) {
+    if (err && typeof err.message === 'string' && err.message.includes('JWT_SECRET')) {
+      return res.status(500).json({ error: 'Server auth configuration is invalid' });
+    }
     return res.status(401).json({ error: 'Invalid token' });
   }
 });
@@ -61,7 +62,7 @@ router.post('/forgot', async (req, res) => {
   // Always respond ok to avoid email enumeration
   if (!admin) return res.json({ ok: true });
 
-  const secret = process.env.JWT_SECRET || 'dev-secret-change-me';
+  const secret = getJwtSecret();
   const token = jwt.sign(
     { sub: String(admin._id), type: 'reset', email: admin.email },
     secret,
@@ -119,7 +120,7 @@ router.post('/reset', async (req, res) => {
   if (!token || !password)
     return res.status(400).json({ error: 'token and password are required' });
   try {
-    const secret = process.env.JWT_SECRET || 'dev-secret-change-me';
+    const secret = getJwtSecret();
     const payload = jwt.verify(token, secret);
     if (payload.type !== 'reset')
       return res.status(400).json({ error: 'invalid token type' });

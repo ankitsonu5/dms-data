@@ -5,7 +5,6 @@ import { DocumentsService, DocumentItem } from '../documents/documents.service';
 import { CategoriesService } from '../categories/categories.service';
 import { forkJoin } from 'rxjs';
 import { FeatherIcon } from '../shared/directives/feather-icon';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-documents-view',
@@ -35,8 +34,7 @@ export class DocumentsViewComponent implements OnInit {
 
   constructor(
     private svc: DocumentsService,
-    private cats: CategoriesService,
-    private sanitizer: DomSanitizer
+    private cats: CategoriesService
   ) {}
 
   ngOnInit(): void {
@@ -185,7 +183,6 @@ export class DocumentsViewComponent implements OnInit {
   // Preview modal
   previewDoc: DocumentItem | null = null;
   previewUrl: string | null = null;
-  trustedPreviewUrl: SafeResourceUrl | null = null;
   previewLoading = false;
 
   onView(d: DocumentItem) {
@@ -201,15 +198,11 @@ export class DocumentsViewComponent implements OnInit {
           } catch {}
         }
         this.previewUrl = URL.createObjectURL(blob);
-        this.trustedPreviewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-          this.previewUrl
-        );
         this.previewLoading = false;
       },
       error: () => {
         this.previewLoading = false;
         this.previewUrl = null;
-        this.trustedPreviewUrl = null;
       },
     });
   }
@@ -221,7 +214,6 @@ export class DocumentsViewComponent implements OnInit {
       } catch {}
     }
     this.previewUrl = null;
-    this.trustedPreviewUrl = null;
     this.previewDoc = null;
     this.previewLoading = false;
   }
@@ -229,7 +221,13 @@ export class DocumentsViewComponent implements OnInit {
   onDownload(d: DocumentItem) {
     this.svc.download(d._id).subscribe((blob: Blob) => {
       const url = URL.createObjectURL(blob);
-      window.open(url, '_blank');
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = d.fileName || 'document';
+      link.rel = 'noopener noreferrer';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
       setTimeout(() => URL.revokeObjectURL(url), 10_000);
     });
   }

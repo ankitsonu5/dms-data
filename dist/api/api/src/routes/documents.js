@@ -23,6 +23,42 @@ const allowed = /* @__PURE__ */ new Set([
   "application/msword",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 ]);
+function createRateLimiter({ windowMs, maxRequests }) {
+  const requestsByIp = /* @__PURE__ */ new Map();
+  return function rateLimiter(req, res, next) {
+    const ip = String(req.ip || req.headers["x-forwarded-for"] || "unknown");
+    const now = Date.now();
+    const start = now - windowMs;
+    const hits = requestsByIp.get(ip) || [];
+    const recentHits = hits.filter((ts) => ts > start);
+    if (recentHits.length >= maxRequests) {
+      return res.status(429).json({
+        error: "Too many requests. Please try again shortly."
+      });
+    }
+    recentHits.push(now);
+    requestsByIp.set(ip, recentHits);
+    next();
+  };
+}
+function resolveStoredPath(storedPath) {
+  if (typeof storedPath !== "string" || !storedPath.trim()) {
+    throw new Error("Invalid file path");
+  }
+  if (storedPath.includes("\0")) {
+    throw new Error("Invalid file path");
+  }
+  const normalized = path.posix.normalize(storedPath).replace(/^\/+/, "");
+  if (!normalized || normalized.includes("..") || normalized.includes("/")) {
+    throw new Error("Invalid file path");
+  }
+  const resolved = path.resolve(uploadsDir, normalized);
+  const uploadsBase = uploadsDir.endsWith(path.sep) ? uploadsDir : `${uploadsDir}${path.sep}`;
+  if (!resolved.startsWith(uploadsBase)) {
+    throw new Error("Invalid file path");
+  }
+  return resolved;
+}
 function fileFilter(_req, file, cb) {
   if (allowed.has(file.mimetype))
     cb(null, true);
@@ -30,6 +66,11 @@ function fileFilter(_req, file, cb) {
     cb(new Error("Unsupported file type"), false);
 }
 const upload = multer({ storage, fileFilter, limits: { fileSize: 25 * 1024 * 1024 } });
+const documentsLimiter = createRateLimiter({
+  windowMs: Number(process.env.DOCUMENTS_RATE_LIMIT_WINDOW_MS || 6e4),
+  maxRequests: Number(process.env.DOCUMENTS_RATE_LIMIT_MAX || 120)
+});
+router.use(documentsLimiter);
 router.get("/", auth, async (req, res) => {
   const { category, from, to } = req.query || {};
   const filter = {};
@@ -90,7 +131,7 @@ router.put("/:id", auth, upload.single("file"), async (req, res) => {
     doc.category = category;
   if (req.file) {
     try {
-      fs.unlinkSync(path.join(uploadsDir, doc.path));
+      fs.unlinkSync(resolveStoredPath(doc.path));
     } catch {
     }
     doc.fileName = req.file.originalname;
@@ -107,7 +148,7 @@ router.delete("/:id", auth, async (req, res) => {
   if (!doc)
     return res.status(404).json({ error: "Not found" });
   try {
-    fs.unlinkSync(path.join(uploadsDir, doc.path));
+    fs.unlinkSync(resolveStoredPath(doc.path));
   } catch {
   }
   res.json({ ok: true });
@@ -117,7 +158,12 @@ router.get("/:id/file", auth, async (req, res) => {
   const doc = await Document.findById(id);
   if (!doc)
     return res.status(404).json({ error: "Not found" });
-  const filePath = path.join(uploadsDir, doc.path);
+  let filePath;
+  try {
+    filePath = resolveStoredPath(doc.path);
+  } catch {
+    return res.status(400).json({ error: "Invalid stored file path" });
+  }
   if (!fs.existsSync(filePath))
     return res.status(404).json({ error: "File missing" });
   res.setHeader("Content-Type", doc.mimeType);

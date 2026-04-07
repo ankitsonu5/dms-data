@@ -1,5 +1,5 @@
-"use strict";
-const mongoose = require("mongoose");
+'use strict';
+const mongoose = require('mongoose');
 const DocumentSchema = new mongoose.Schema(
   {
     title: { type: String, required: true, trim: true },
@@ -10,11 +10,11 @@ const DocumentSchema = new mongoose.Schema(
     size: { type: Number, required: true },
     path: { type: String, required: true },
     // Uploader (optional later)
-    ownerEmail: { type: String, trim: true }
+    ownerEmail: { type: String, trim: true },
   },
   { timestamps: true }
 );
 DocumentSchema.index({ createdAt: -1 });
 DocumentSchema.index({ category: 1, createdAt: -1 });
-module.exports = mongoose.model("Document", DocumentSchema);
+module.exports = mongoose.model('Document', DocumentSchema);
 //# sourceMappingURL=Document.js.map

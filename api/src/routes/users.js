@@ -55,6 +55,25 @@ router.put('/:id', auth, async (req, res) => {
   res.json(updated);
 });
 
+// Direct password reset by admin (no email)
+router.post('/reset-password', auth, async (req, res) => {
+  const { email, password } = req.body || {};
+  if (!email || !password)
+    return res.status(400).json({ error: 'email and password are required' });
+  if (password.length < 6)
+    return res
+      .status(400)
+      .json({ error: 'password must be at least 6 characters' });
+  const passwordHash = await bcrypt.hash(password, 10);
+  const updated = await Admin.findOneAndUpdate(
+    { email: String(email).toLowerCase().trim() },
+    { $set: { passwordHash } },
+    { new: true, projection: { passwordHash: 0 } }
+  );
+  if (!updated) return res.status(404).json({ error: 'user not found' });
+  res.json({ ok: true });
+});
+
 // Delete user
 router.delete('/:id', auth, async (req, res) => {
   const { id } = req.params;

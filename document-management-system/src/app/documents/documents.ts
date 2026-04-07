@@ -143,7 +143,10 @@ export class DocumentsComponent implements OnInit {
   }
 
   private sanitizeFilename(name: string): string {
-    return name.replace(/[^a-zA-Z0-9._-]+/g, '_').replace(/^[_.-]+/, '') || 'document';
+    return (
+      name.replace(/[^a-zA-Z0-9._-]+/g, '_').replace(/^[_.-]+/, '') ||
+      'document'
+    );
   }
 
   private createSafeBlobUrl(blob: Blob): string | null {

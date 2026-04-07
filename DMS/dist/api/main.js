@@ -1,24 +1,30 @@
-const Module = require("module");
-const path = require("path");
-const fs = require("fs");
+const Module = require('module');
+const path = require('path');
+const fs = require('fs');
 const originalResolveFilename = Module._resolveFilename;
 const distPath = __dirname;
 const manifest = [];
-Module._resolveFilename = function(request, parent) {
+Module._resolveFilename = function (request, parent) {
   let found;
   for (const entry of manifest) {
     if (request === entry.module && entry.exactMatch) {
-      const entry2 = manifest.find((x) => request === x.module || request.startsWith(x.module + "/"));
+      const entry2 = manifest.find(
+        (x) => request === x.module || request.startsWith(x.module + '/')
+      );
       const candidate = path.join(distPath, entry2.exactMatch);
       if (isFile(candidate)) {
         found = candidate;
         break;
       }
     } else {
-      const re = new RegExp(entry.module.replace(/\*$/, "(?<rest>.*)"));
+      const re = new RegExp(entry.module.replace(/\*$/, '(?<rest>.*)'));
       const match = request.match(re);
       if (match?.groups) {
-        const candidate = path.join(distPath, entry.pattern.replace("*", ""), match.groups.rest);
+        const candidate = path.join(
+          distPath,
+          entry.pattern.replace('*', ''),
+          match.groups.rest
+        );
         if (isFile(candidate)) {
           found = candidate;
         }
@@ -40,5 +46,5 @@ function isFile(s) {
     return false;
   }
 }
-module.exports = require("./api/src/main.js");
+module.exports = require('./api/src/main.js');
 //# sourceMappingURL=main.js.map

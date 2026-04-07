@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../../../api/src/models/Category.js"],
+  "sourcesContent": ["'use strict';\n\nconst mongoose = require('mongoose');\n\nconst CategorySchema = new mongoose.Schema(\n  {\n    name: { type: String, required: true, trim: true, unique: true },\n  },\n  { timestamps: true }\n);\n\nCategorySchema.index({ name: 1 }, { unique: true });\n\nmodule.exports = mongoose.model('Category', CategorySchema);\n\n"],
+  "mappings": ";AAEA,MAAM,WAAW,QAAQ,UAAU;AAEnC,MAAM,iBAAiB,IAAI,SAAS;AAAA,EAClC;AAAA,IACE,MAAM,EAAE,MAAM,QAAQ,UAAU,MAAM,MAAM,MAAM,QAAQ,KAAK;AAAA,EACjE;AAAA,EACA,EAAE,YAAY,KAAK;AACrB;AAEA,eAAe,MAAM,EAAE,MAAM,EAAE,GAAG,EAAE,QAAQ,KAAK,CAAC;AAElD,OAAO,UAAU,SAAS,MAAM,YAAY,cAAc;",
+  "names": []
+}

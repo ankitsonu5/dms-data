@@ -129,43 +129,16 @@ export class DocumentsComponent implements OnInit {
 
   onDownload(d: DocumentItem) {
     this.svc.download(d._id).subscribe((blob: Blob) => {
-      const safeUrl = this.createSafeBlobUrl(blob);
-      if (!safeUrl) return;
-
+      const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
-      const safeName = this.sanitizeFilename(d.fileName || 'document');
-      link.href = safeUrl;
-      link.download = safeName;
+      link.href = url;
+      link.download = d.fileName || 'document';
       link.rel = 'noopener noreferrer';
+      document.body.appendChild(link);
       link.click();
-      setTimeout(() => URL.revokeObjectURL(safeUrl), 10_000);
+      document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(url), 10_000);
     });
-  }
-
-  private sanitizeFilename(name: string): string {
-    return name.replace(/[^a-zA-Z0-9._-]+/g, '_').replace(/^[_.-]+/, '') || 'document';
-  }
-
-  private createSafeBlobUrl(blob: Blob): string | null {
-    if (!this.isAllowedBlobType(blob.type)) return null;
-    const objectUrl = URL.createObjectURL(blob);
-    return objectUrl.startsWith('blob:') ? objectUrl : null;
-  }
-
-  private isAllowedBlobType(type: string): boolean {
-    const normalized = (type || '').toLowerCase();
-    if (!normalized) return true;
-    return [
-      'application/pdf',
-      'image/png',
-      'image/jpeg',
-      'image/jpg',
-      'text/plain',
-      'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'application/vnd.ms-excel',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    ].includes(normalized);
   }
 
   onDelete(d: DocumentItem) {
@@ -190,7 +163,7 @@ export class DocumentsComponent implements OnInit {
             URL.revokeObjectURL(this.previewUrl);
           } catch {}
         }
-        this.previewUrl = this.createSafeBlobUrl(blob);
+        this.previewUrl = URL.createObjectURL(blob);
         this.previewLoading = false;
       },
       error: () => {

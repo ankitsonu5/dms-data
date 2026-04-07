@@ -215,23 +215,16 @@ export class DocumentsViewComponent implements OnInit {
     this.previewLoading = false;
   }
 
-  private sanitizeFileName(name: string | null | undefined): string {
-    const safe = (name || 'document')
-      .replace(/[\/\\?%*:|"<>]/g, '_')
-      .replace(/[\u0000-\u001f\u007f]/g, '')
-      .trim();
-
-    return safe || 'document';
-  }
-
   onDownload(d: DocumentItem) {
     this.svc.download(d._id).subscribe((blob: Blob) => {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = this.sanitizeFileName(d.fileName);
+      link.download = d.fileName || 'document';
       link.rel = 'noopener noreferrer';
+      document.body.appendChild(link);
       link.click();
+      document.body.removeChild(link);
       setTimeout(() => URL.revokeObjectURL(url), 10_000);
     });
   }

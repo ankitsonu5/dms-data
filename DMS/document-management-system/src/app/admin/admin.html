@@ -1,0 +1,112 @@
+<div class="min-h-screen bg-gray-50">
+  <!-- Topbar -->
+  <header
+    class="sticky top-0 z-10 bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60 border-b"
+  >
+    <div class="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div
+          class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow"
+        >
+          <span [featherIcon]="'folder'" class="h-4 w-4"></span>
+        </div>
+        <div class="text-sm">
+          <div class="font-semibold leading-4">Document Management</div>
+          <div class="text-gray-500 leading-4">Admin Dashboard</div>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="hidden sm:block text-sm text-gray-600" *ngIf="userEmail">
+          {{ userEmail }}
+        </div>
+        <button
+          (click)="logout()"
+          class="inline-flex items-center gap-2 rounded-md bg-gray-900 px-3 py-2 text-white hover:bg-black"
+        >
+          <span [featherIcon]="'log-out'" class="h-4 w-4"></span>
+          <span class="text-sm">Logout</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div
+    class="mx-auto max-w-7xl px-4 py-8 grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-6"
+  >
+    <!-- Sidebar -->
+    <aside class="lg:sticky lg:top-16 self-start">
+      <nav class="rounded-xl border bg-white p-3 shadow-sm">
+        <a
+          class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm hover:bg-gray-50"
+          [routerLink]="['/dashboard']"
+        >
+          <span
+            [featherIcon]="'home'"
+            class="h-4 w-4 text-gray-500 group-hover:text-gray-700"
+          ></span>
+          <span>Dashboard</span>
+        </a>
+        <a
+          class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm hover:bg-gray-50"
+          [routerLink]="['/documents']"
+        >
+          <span
+            [featherIcon]="'file-text'"
+            class="h-4 w-4 text-gray-500 group-hover:text-gray-700"
+          ></span>
+          <span>Documents</span>
+        </a>
+        <a
+          class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm hover:bg-gray-50"
+          [routerLink]="['/documents','upload']"
+        >
+          <span
+            [featherIcon]="'upload'"
+            class="h-4 w-4 text-gray-500 group-hover:text-gray-700"
+          ></span>
+          <span>Upload Document</span>
+        </a>
+        <a
+          class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm hover:bg-gray-50"
+          [routerLink]="['/categories']"
+        >
+          <span
+            [featherIcon]="'tag'"
+            class="h-4 w-4 text-gray-500 group-hover:text-gray-700"
+          ></span>
+          <span>Categories</span>
+        </a>
+        <a
+          class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm hover:bg-gray-50"
+          [routerLink]="['/users']"
+        >
+          <span
+            [featherIcon]="'users'"
+            class="h-4 w-4 text-gray-500 group-hover:text-gray-700"
+          ></span>
+          <span>Users</span>
+        </a>
+        <a
+          class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm hover:bg-gray-50"
+          [routerLink]="['/settings']"
+        >
+          <span
+            [featherIcon]="'settings'"
+            class="h-4 w-4 text-gray-500 group-hover:text-gray-700"
+          ></span>
+          <span>Settings</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main content -->
+    <main>
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <footer
+    class="mt-10 border-t py-6 text-center text-sm text-gray-600"
+  ></footer>
+</div>

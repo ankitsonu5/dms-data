@@ -25,7 +25,6 @@ async function start() {
     process.exit(1);
   }
   const app = express();
-  app.disable("x-powered-by");
   app.use(express.json());
   app.use(
     cors({

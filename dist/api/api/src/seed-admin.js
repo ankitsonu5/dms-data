@@ -8,8 +8,7 @@ async function run() {
   const mongoUri = process.env.MONGODB_URI;
   const email = (process.env.ADMIN_EMAIL || "").toLowerCase().trim();
   const password = process.env.ADMIN_PASSWORD || "";
-  if (!mongoUri)
-    throw new Error("MONGODB_URI is not set");
+  if (!mongoUri) throw new Error("MONGODB_URI is not set");
   if (!email || !password)
     throw new Error("ADMIN_EMAIL or ADMIN_PASSWORD not set");
   await mongoose.connect(mongoUri);
@@ -20,7 +19,10 @@ async function run() {
     { email, passwordHash, role: "admin" },
     { upsert: true, new: true, setDefaultsOnInsert: true }
   );
-  console.log("Admin upserted:", { email: result.email, id: result._id.toString() });
+  console.log("Admin upserted:", {
+    email: result.email,
+    id: result._id.toString()
+  });
   await mongoose.disconnect();
 }
 run().catch((err) => {

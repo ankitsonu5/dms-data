@@ -5,7 +5,9 @@ const Admin = require("../models/Admin");
 const { auth } = require("../middleware/auth");
 const router = express.Router();
 router.get("/", auth, async (_req, res) => {
-  const items = await Admin.find({}, { passwordHash: 0 }).sort({ createdAt: -1 });
+  const items = await Admin.find({}, { passwordHash: 0 }).sort({
+    createdAt: -1
+  });
   res.json(items);
 });
 router.post("/", auth, async (req, res) => {
@@ -14,7 +16,11 @@ router.post("/", auth, async (req, res) => {
     return res.status(400).json({ error: "email and password are required" });
   const passwordHash = await bcrypt.hash(password, 10);
   try {
-    const created = await Admin.create({ email: String(email).toLowerCase().trim(), passwordHash, role: role || "admin" });
+    const created = await Admin.create({
+      email: String(email).toLowerCase().trim(),
+      passwordHash,
+      role: role || "admin"
+    });
     const out = created.toObject();
     delete out.passwordHash;
     res.status(201).json(out);
@@ -28,22 +34,36 @@ router.put("/:id", auth, async (req, res) => {
   const { id } = req.params;
   const { email, password, role } = req.body || {};
   const update = {};
-  if (email)
-    update.email = String(email).toLowerCase().trim();
-  if (role)
-    update.role = role;
-  if (password)
-    update.passwordHash = await bcrypt.hash(password, 10);
-  const updated = await Admin.findByIdAndUpdate(id, { $set: update }, { new: true, projection: { passwordHash: 0 } });
-  if (!updated)
-    return res.status(404).json({ error: "not found" });
+  if (email) update.email = String(email).toLowerCase().trim();
+  if (role) update.role = role;
+  if (password) update.passwordHash = await bcrypt.hash(password, 10);
+  const updated = await Admin.findByIdAndUpdate(
+    id,
+    { $set: update },
+    { new: true, projection: { passwordHash: 0 } }
+  );
+  if (!updated) return res.status(404).json({ error: "not found" });
   res.json(updated);
+});
+router.post("/reset-password", auth, async (req, res) => {
+  const { email, password } = req.body || {};
+  if (!email || !password)
+    return res.status(400).json({ error: "email and password are required" });
+  if (password.length < 6)
+    return res.status(400).json({ error: "password must be at least 6 characters" });
+  const passwordHash = await bcrypt.hash(password, 10);
+  const updated = await Admin.findOneAndUpdate(
+    { email: String(email).toLowerCase().trim() },
+    { $set: { passwordHash } },
+    { new: true, projection: { passwordHash: 0 } }
+  );
+  if (!updated) return res.status(404).json({ error: "user not found" });
+  res.json({ ok: true });
 });
 router.delete("/:id", auth, async (req, res) => {
   const { id } = req.params;
   const del = await Admin.findByIdAndDelete(id);
-  if (!del)
-    return res.status(404).json({ error: "not found" });
+  if (!del) return res.status(404).json({ error: "not found" });
   res.json({ ok: true });
 });
 module.exports = router;

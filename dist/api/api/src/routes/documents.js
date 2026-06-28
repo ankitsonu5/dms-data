@@ -60,12 +60,14 @@ function resolveStoredPath(storedPath) {
   return resolved;
 }
 function fileFilter(_req, file, cb) {
-  if (allowed.has(file.mimetype))
-    cb(null, true);
-  else
-    cb(new Error("Unsupported file type"), false);
+  if (allowed.has(file.mimetype)) cb(null, true);
+  else cb(new Error("Unsupported file type"), false);
 }
-const upload = multer({ storage, fileFilter, limits: { fileSize: 25 * 1024 * 1024 } });
+const upload = multer({
+  storage,
+  fileFilter,
+  limits: { fileSize: 25 * 1024 * 1024 }
+});
 const documentsLimiter = createRateLimiter({
   windowMs: Number(process.env.DOCUMENTS_RATE_LIMIT_WINDOW_MS || 6e4),
   maxRequests: Number(process.env.DOCUMENTS_RATE_LIMIT_MAX || 120)
@@ -74,12 +76,10 @@ router.use(documentsLimiter);
 router.get("/", auth, async (req, res) => {
   const { category, from, to } = req.query || {};
   const filter = {};
-  if (category)
-    filter.category = String(category);
+  if (category) filter.category = String(category);
   if (from || to) {
     filter.createdAt = {};
-    if (from)
-      filter.createdAt.$gte = new Date(String(from));
+    if (from) filter.createdAt.$gte = new Date(String(from));
     if (to) {
       const end = new Date(String(to));
       end.setHours(23, 59, 59, 999);
@@ -103,8 +103,7 @@ router.get("/", auth, async (req, res) => {
 });
 router.post("/", auth, upload.single("file"), async (req, res) => {
   const { title, description, category } = req.body;
-  if (!req.file)
-    return res.status(400).json({ error: "File is required" });
+  if (!req.file) return res.status(400).json({ error: "File is required" });
   const doc = await Document.create({
     title,
     description,
@@ -121,14 +120,10 @@ router.put("/:id", auth, upload.single("file"), async (req, res) => {
   const { id } = req.params;
   const { title, description, category } = req.body;
   const doc = await Document.findById(id);
-  if (!doc)
-    return res.status(404).json({ error: "Not found" });
-  if (typeof title === "string" && title)
-    doc.title = title;
-  if (typeof description !== "undefined")
-    doc.description = description;
-  if (typeof category !== "undefined")
-    doc.category = category;
+  if (!doc) return res.status(404).json({ error: "Not found" });
+  if (typeof title === "string" && title) doc.title = title;
+  if (typeof description !== "undefined") doc.description = description;
+  if (typeof category !== "undefined") doc.category = category;
   if (req.file) {
     try {
       fs.unlinkSync(resolveStoredPath(doc.path));
@@ -145,8 +140,7 @@ router.put("/:id", auth, upload.single("file"), async (req, res) => {
 router.delete("/:id", auth, async (req, res) => {
   const { id } = req.params;
   const doc = await Document.findByIdAndDelete(id);
-  if (!doc)
-    return res.status(404).json({ error: "Not found" });
+  if (!doc) return res.status(404).json({ error: "Not found" });
   try {
     fs.unlinkSync(resolveStoredPath(doc.path));
   } catch {
@@ -156,8 +150,7 @@ router.delete("/:id", auth, async (req, res) => {
 router.get("/:id/file", auth, async (req, res) => {
   const { id } = req.params;
   const doc = await Document.findById(id);
-  if (!doc)
-    return res.status(404).json({ error: "Not found" });
+  if (!doc) return res.status(404).json({ error: "Not found" });
   let filePath;
   try {
     filePath = resolveStoredPath(doc.path);
@@ -167,7 +160,10 @@ router.get("/:id/file", auth, async (req, res) => {
   if (!fs.existsSync(filePath))
     return res.status(404).json({ error: "File missing" });
   res.setHeader("Content-Type", doc.mimeType);
-  res.setHeader("Content-Disposition", `inline; filename="${doc.fileName.replace(/"/g, "")}"`);
+  res.setHeader(
+    "Content-Disposition",
+    `inline; filename="${doc.fileName.replace(/"/g, "")}"`
+  );
   fs.createReadStream(filePath).pipe(res);
 });
 module.exports = router;

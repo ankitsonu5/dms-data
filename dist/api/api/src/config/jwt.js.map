@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../../../api/src/config/jwt.js"],
+  "sourcesContent": ["'use strict';\n\nfunction getJwtSecret() {\n  const secret = process.env.JWT_SECRET;\n  if (!secret || typeof secret !== 'string' || secret.trim().length < 32) {\n    throw new Error(\n      'JWT_SECRET must be set and at least 32 characters long. Configure it in your environment.'\n    );\n  }\n  return secret;\n}\n\nmodule.exports = { getJwtSecret };\n"],
+  "mappings": ";AAEA,SAAS,eAAe;AACtB,QAAM,SAAS,QAAQ,IAAI;AAC3B,MAAI,CAAC,UAAU,OAAO,WAAW,YAAY,OAAO,KAAK,EAAE,SAAS,IAAI;AACtE,UAAM,IAAI;AAAA,MACR;AAAA,IACF;AAAA,EACF;AACA,SAAO;AACT;AAEA,OAAO,UAAU,EAAE,aAAa;",
+  "names": []
+}

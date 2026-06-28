@@ -31,8 +31,7 @@ router.put("/:id", auth, async (req, res) => {
       { $set: { name: String(name).trim() } },
       { new: true }
     );
-    if (!updated)
-      return res.status(404).json({ error: "Not found" });
+    if (!updated) return res.status(404).json({ error: "Not found" });
     res.json(updated);
   } catch (e) {
     if (e.code === 11e3)
@@ -43,8 +42,7 @@ router.put("/:id", auth, async (req, res) => {
 router.delete("/:id", auth, async (req, res) => {
   const { id } = req.params;
   const deleted = await Category.findByIdAndDelete(id);
-  if (!deleted)
-    return res.status(404).json({ error: "Not found" });
+  if (!deleted) return res.status(404).json({ error: "Not found" });
   res.json({ ok: true });
 });
 module.exports = router;

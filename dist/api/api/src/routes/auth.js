@@ -17,12 +17,12 @@ router.post("/login", async (req, res) => {
     if (!email || !password) {
       return res.status(400).json({ error: "Email and password are required" });
     }
-    const admin = await Admin.findOne({ email: String(email).toLowerCase().trim() });
-    if (!admin)
-      return res.status(401).json({ error: "Invalid credentials" });
+    const admin = await Admin.findOne({
+      email: String(email).toLowerCase().trim()
+    });
+    if (!admin) return res.status(401).json({ error: "Invalid credentials" });
     const ok = await bcrypt.compare(password, admin.passwordHash);
-    if (!ok)
-      return res.status(401).json({ error: "Invalid credentials" });
+    if (!ok) return res.status(401).json({ error: "Invalid credentials" });
     const token = signToken(admin);
     return res.json({ token, user: { email: admin.email, role: admin.role } });
   } catch (err) {
@@ -34,8 +34,7 @@ router.get("/me", (req, res) => {
   try {
     const auth = req.headers.authorization || "";
     const token = auth.startsWith("Bearer ") ? auth.slice(7) : null;
-    if (!token)
-      return res.status(401).json({ error: "Missing token" });
+    if (!token) return res.status(401).json({ error: "Missing token" });
     const payload = jwt.verify(token, getJwtSecret());
     return res.json({ user: { email: payload.email, role: payload.role } });
   } catch (err) {
@@ -47,16 +46,20 @@ router.get("/me", (req, res) => {
 });
 router.post("/forgot", async (req, res) => {
   const { email } = req.body || {};
-  if (!email)
-    return res.status(400).json({ error: "email is required" });
-  const admin = await Admin.findOne({ email: String(email).toLowerCase().trim() });
-  if (!admin)
-    return res.json({ ok: true });
-  const secret = getJwtSecret();
-  const token = jwt.sign({ sub: String(admin._id), type: "reset", email: admin.email }, secret, {
-    algorithm: "HS256",
-    expiresIn: "1h"
+  if (!email) return res.status(400).json({ error: "email is required" });
+  const admin = await Admin.findOne({
+    email: String(email).toLowerCase().trim()
   });
+  if (!admin) return res.json({ ok: true });
+  const secret = getJwtSecret();
+  const token = jwt.sign(
+    { sub: String(admin._id), type: "reset", email: admin.email },
+    secret,
+    {
+      algorithm: "HS256",
+      expiresIn: "1h"
+    }
+  );
   const host = process.env.SMTP_HOST;
   const user = process.env.SMTP_USER;
   const pass = process.env.SMTP_PASS;
@@ -65,7 +68,12 @@ router.post("/forgot", async (req, res) => {
   const secure = String(process.env.SMTP_SECURE || "true") === "true";
   if (host && user && pass && from) {
     try {
-      const transporter = nodemailer.createTransport({ host, port, secure, auth: { user, pass } });
+      const transporter = nodemailer.createTransport({
+        host,
+        port,
+        secure,
+        auth: { user, pass }
+      });
       const web = process.env.WEB_URL ? String(process.env.WEB_URL).replace(/\/$/, "") : "";
       const link = web ? `${web}/reset?token=${encodeURIComponent(token)}` : null;
       const text = link ? `You requested a password reset. Click this link to reset your password: ${link}
@@ -94,8 +102,7 @@ router.post("/reset", async (req, res) => {
     if (payload.type !== "reset")
       return res.status(400).json({ error: "invalid token type" });
     const admin = await Admin.findById(payload.sub);
-    if (!admin)
-      return res.status(404).json({ error: "user not found" });
+    if (!admin) return res.status(404).json({ error: "user not found" });
     const bcrypt2 = require("bcryptjs");
     admin.passwordHash = await bcrypt2.hash(password, 10);
     await admin.save();

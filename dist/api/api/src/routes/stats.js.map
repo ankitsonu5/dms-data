@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../../../api/src/routes/stats.js"],
+  "sourcesContent": ["'use strict';\n\nconst express = require('express');\nconst { auth } = require('../middleware/auth');\nconst Document = require('../models/Document');\nconst Admin = require('../models/Admin');\n\nconst router = express.Router();\n\n// GET /stats - basic dashboard counters\nrouter.get('/', auth, async (_req, res) => {\n  const start = new Date();\n  start.setHours(0, 0, 0, 0);\n  const end = new Date();\n  end.setHours(23, 59, 59, 999);\n\n  const [documentsTotal, documentsToday, usersTotal] = await Promise.all([\n    Document.countDocuments({}),\n    Document.countDocuments({ createdAt: { $gte: start, $lte: end } }),\n    Admin.countDocuments({}),\n  ]);\n\n  res.json({ documentsTotal, documentsToday, usersTotal });\n});\n\nmodule.exports = router;\n"],
+  "mappings": ";AAEA,MAAM,UAAU,QAAQ,SAAS;AACjC,MAAM,EAAE,KAAK,IAAI,QAAQ,oBAAoB;AAC7C,MAAM,WAAW,QAAQ,oBAAoB;AAC7C,MAAM,QAAQ,QAAQ,iBAAiB;AAEvC,MAAM,SAAS,QAAQ,OAAO;AAG9B,OAAO,IAAI,KAAK,MAAM,OAAO,MAAM,QAAQ;AACzC,QAAM,QAAQ,oBAAI,KAAK;AACvB,QAAM,SAAS,GAAG,GAAG,GAAG,CAAC;AACzB,QAAM,MAAM,oBAAI,KAAK;AACrB,MAAI,SAAS,IAAI,IAAI,IAAI,GAAG;AAE5B,QAAM,CAAC,gBAAgB,gBAAgB,UAAU,IAAI,MAAM,QAAQ,IAAI;AAAA,IACrE,SAAS,eAAe,CAAC,CAAC;AAAA,IAC1B,SAAS,eAAe,EAAE,WAAW,EAAE,MAAM,OAAO,MAAM,IAAI,EAAE,CAAC;AAAA,IACjE,MAAM,eAAe,CAAC,CAAC;AAAA,EACzB,CAAC;AAED,MAAI,KAAK,EAAE,gBAAgB,gBAAgB,WAAW,CAAC;AACzD,CAAC;AAED,OAAO,UAAU;",
+  "names": []
+}

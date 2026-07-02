@@ -88,6 +88,16 @@
         </a>
         <a
           class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm hover:bg-gray-50"
+          [routerLink]="['/payments']"
+        >
+          <span
+            [featherIcon]="'credit-card'"
+            class="h-4 w-4 text-gray-500 group-hover:text-gray-700"
+          ></span>
+          <span>Payments</span>
+        </a>
+        <a
+          class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm hover:bg-gray-50"
           [routerLink]="['/settings']"
         >
           <span

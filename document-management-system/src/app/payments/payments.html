@@ -1,0 +1,211 @@
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-xl font-semibold">Payments</h1>
+      <p class="text-sm text-gray-500 mt-0.5">
+        Collect payments via HDFC Collect Now (Razorpay)
+      </p>
+    </div>
+    <button
+      (click)="openForm()"
+      class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+    >
+      <span [featherIcon]="'plus'" class="h-4 w-4"></span>
+      New Payment
+    </button>
+  </div>
+
+  <!-- Success banner -->
+  <div
+    *ngIf="successMsg"
+    class="rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700 flex items-center gap-2"
+  >
+    <span [featherIcon]="'check-circle'" class="h-4 w-4 shrink-0"></span>
+    {{ successMsg }}
+  </div>
+
+  <!-- New Payment Modal -->
+  <div
+    *ngIf="showForm"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+  >
+    <div class="w-full max-w-md rounded-xl bg-white shadow-xl p-6 mx-4">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold">New Payment</h2>
+        <button (click)="closeForm()" class="text-gray-400 hover:text-gray-600">
+          <span [featherIcon]="'x'" class="h-5 w-5"></span>
+        </button>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1"
+            >Amount (₹) <span class="text-red-500">*</span></label
+          >
+          <input
+            [(ngModel)]="form.amountRs"
+            type="number"
+            min="1"
+            step="0.01"
+            placeholder="e.g. 500"
+            class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1"
+            >Description</label
+          >
+          <input
+            [(ngModel)]="form.description"
+            type="text"
+            placeholder="Payment description"
+            class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1"
+            >Customer Name</label
+          >
+          <input
+            [(ngModel)]="form.customerName"
+            type="text"
+            placeholder="Full name"
+            class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1"
+            >Customer Email</label
+          >
+          <input
+            [(ngModel)]="form.customerEmail"
+            type="email"
+            placeholder="email@example.com"
+            class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1"
+            >Customer Contact</label
+          >
+          <input
+            [(ngModel)]="form.customerContact"
+            type="tel"
+            placeholder="10-digit mobile number"
+            class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+
+        <div
+          *ngIf="formError"
+          class="rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-600"
+        >
+          {{ formError }}
+        </div>
+
+        <button
+          (click)="initiatePayment()"
+          [disabled]="paying || !form.amountRs"
+          class="w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        >
+          <span
+            *ngIf="paying"
+            class="animate-spin inline-block h-4 w-4 border-2 border-white border-t-transparent rounded-full"
+          ></span>
+          {{ paying ? 'Processing…' : 'Proceed to Pay' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payments Table -->
+  <div class="rounded-xl border bg-white shadow-sm overflow-hidden">
+    <div *ngIf="loading" class="p-8 text-center text-sm text-gray-500">
+      Loading…
+    </div>
+    <div *ngIf="error" class="p-8 text-center text-sm text-red-500">
+      {{ error }}
+    </div>
+
+    <table *ngIf="!loading && !error" class="w-full text-sm">
+      <thead
+        class="border-b bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wide"
+      >
+        <tr>
+          <th class="px-4 py-3 text-left">Date</th>
+          <th class="px-4 py-3 text-left">Description</th>
+          <th class="px-4 py-3 text-left">Customer</th>
+          <th class="px-4 py-3 text-right">Amount</th>
+          <th class="px-4 py-3 text-left">Status</th>
+          <th class="px-4 py-3 text-left">Order ID</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="payments.length === 0">
+          <td colspan="6" class="px-4 py-10 text-center text-gray-400">
+            No payments yet. Click "New Payment" to collect one.
+          </td>
+        </tr>
+        <tr
+          *ngFor="let p of payments"
+          class="border-b last:border-0 hover:bg-gray-50 transition-colors"
+        >
+          <td class="px-4 py-3 text-gray-600 whitespace-nowrap">
+            {{ p.createdAt | date: 'dd MMM yyyy, HH:mm' }}
+          </td>
+          <td class="px-4 py-3 text-gray-700 max-w-[180px] truncate">
+            {{ p.description || '—' }}
+          </td>
+          <td class="px-4 py-3 text-gray-700">
+            <div>{{ p.customerName || '—' }}</div>
+            <div class="text-xs text-gray-400">{{ p.customerEmail || '' }}</div>
+          </td>
+          <td class="px-4 py-3 text-right font-medium text-gray-800">
+            ₹{{ amountInRs(p.amount) }}
+          </td>
+          <td class="px-4 py-3">
+            <span
+              class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
+              [ngClass]="statusClass(p.status)"
+            >
+              {{ p.status }}
+            </span>
+          </td>
+          <td
+            class="px-4 py-3 font-mono text-xs text-gray-400 max-w-[160px] truncate"
+            [title]="p.razorpayOrderId"
+          >
+            {{ p.razorpayOrderId }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <div
+      *ngIf="!loading && !error && total > limit"
+      class="flex items-center justify-between px-4 py-3 border-t text-sm text-gray-600"
+    >
+      <span
+        >Showing {{ (page - 1) * limit + 1 }}–{{ pageEnd }} of {{ total }}</span
+      >
+      <div class="flex gap-2">
+        <button
+          (click)="prevPage()"
+          [disabled]="page === 1"
+          class="px-3 py-1 rounded border hover:bg-gray-50 disabled:opacity-40"
+        >
+          Prev
+        </button>
+        <button
+          (click)="nextPage()"
+          [disabled]="page === totalPages"
+          class="px-3 py-1 rounded border hover:bg-gray-50 disabled:opacity-40"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

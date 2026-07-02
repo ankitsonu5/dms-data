@@ -9,6 +9,7 @@ const authRouter = require('./routes/auth');
 const documentsRouter = require('./routes/documents');
 const usersRouter = require('./routes/users');
 const categoriesRouter = require('./routes/categories');
+const paymentsRouter = require('./routes/payments');
 const { auth } = require('./middleware/auth');
 
 dotenv.config();
@@ -49,6 +50,7 @@ async function start() {
   app.use('/documents', documentsRouter);
   app.use('/users', usersRouter);
   app.use('/categories', categoriesRouter);
+  app.use('/payments', paymentsRouter);
   app.get('/stats', auth, async (_req, res) => {
     const Document = require('./models/Document');
     const Admin = require('./models/Admin');

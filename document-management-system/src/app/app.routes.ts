@@ -8,6 +8,7 @@ import { SettingsComponent } from './settings/settings';
 import { DocumentsViewComponent } from './documents-view/documents-view';
 import { CategoriesComponent } from './categories/categories';
 import { DashboardComponent } from './dashboard/dashboard';
+import { PaymentsComponent } from './payments/payments';
 
 export const appRoutes: Route[] = [
   { path: 'login', component: LoginComponent },
@@ -22,6 +23,7 @@ export const appRoutes: Route[] = [
       { path: 'users', component: UsersComponent },
       { path: 'settings', component: SettingsComponent },
       { path: 'categories', component: CategoriesComponent },
+      { path: 'payments', component: PaymentsComponent },
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
     ],
   },

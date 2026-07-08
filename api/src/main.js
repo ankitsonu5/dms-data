@@ -12,7 +12,7 @@ const categoriesRouter = require('./routes/categories');
 const paymentsRouter = require('./routes/payments');
 const { auth } = require('./middleware/auth');
 
-dotenv.config();
+dotenv.config({ path: require('path').join(__dirname, '../.env') });
 
 const host = process.env.HOST || 'localhost';
 const port = process.env.PORT ? Number(process.env.PORT) : 3000;
@@ -38,9 +38,9 @@ async function start() {
   app.use(
     cors({
       origin: [
-        /^http:\/\/localhost(?::\d+)?$/,
-        /^http:\/\/127\.0\.0\.1(?::\d+)?$/,
-        /^http:\/\/dms-vns-01\.protoninternet\.com(?::\d+)?$/,
+        /^https?:\/\/localhost(?::\d+)?$/,
+        /^https?:\/\/127\.0\.0\.1(?::\d+)?$/,
+        /^https?:\/\/dms-vns-01\.protoninternet\.com(?::\d+)?$/,
       ],
       credentials: false,
     })

@@ -14,12 +14,16 @@ import { UserRegisterComponent } from './user-register/user-register';
 import { UserLoginComponent } from './user-login/user-login';
 import { UserDashboardComponent } from './user-dashboard/user-dashboard';
 import { userAuthGuard } from './user/user-auth.guard';
+import { UserForgotComponent } from './user-forgot/user-forgot';
+import { UserResetComponent } from './user-reset/user-reset';
 
 export const appRoutes: Route[] = [
   // Public user-facing routes
   { path: '', component: LandingComponent, pathMatch: 'full' },
   { path: 'register', component: UserRegisterComponent },
   { path: 'user-login', component: UserLoginComponent },
+  { path: 'user-forgot', component: UserForgotComponent },
+  { path: 'user-reset', component: UserResetComponent },
   {
     path: 'user-dashboard',
     component: UserDashboardComponent,

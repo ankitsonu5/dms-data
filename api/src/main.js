@@ -10,6 +10,7 @@ const documentsRouter = require('./routes/documents');
 const usersRouter = require('./routes/users');
 const categoriesRouter = require('./routes/categories');
 const paymentsRouter = require('./routes/payments');
+const userAuthRouter = require('./routes/userAuth');
 const { auth } = require('./middleware/auth');
 
 dotenv.config({ path: require('path').join(__dirname, '../.env') });
@@ -51,6 +52,7 @@ async function start() {
   app.use('/users', usersRouter);
   app.use('/categories', categoriesRouter);
   app.use('/payments', paymentsRouter);
+  app.use('/user', userAuthRouter);
   app.get('/stats', auth, async (_req, res) => {
     const Document = require('./models/Document');
     const Admin = require('./models/Admin');

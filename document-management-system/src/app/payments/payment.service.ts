@@ -64,6 +64,10 @@ export class PaymentService {
     );
   }
 
+  myPayments(): Observable<PaymentRecord[]> {
+    return this.http.get<PaymentRecord[]>(`${this.api}/payments/my`);
+  }
+
   list(
     params: { page?: number; limit?: number; status?: string } = {}
   ): Observable<{ items: PaymentRecord[]; total: number }> {

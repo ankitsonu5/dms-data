@@ -5,6 +5,7 @@ const crypto = require('crypto');
 const Razorpay = require('razorpay');
 const Payment = require('../models/Payment');
 const { auth } = require('../middleware/auth');
+const { anyAuth, userAuth } = require('../middleware/anyAuth');
 
 const router = express.Router();
 
@@ -19,7 +20,7 @@ function getRazorpay() {
 
 // POST /payments/create-order
 // Creates a Razorpay order and stores it in the database
-router.post('/create-order', auth, async (req, res) => {
+router.post('/create-order', anyAuth, async (req, res) => {
   try {
     const {
       amount,
@@ -77,7 +78,20 @@ router.post('/create-order', auth, async (req, res) => {
 
 // POST /payments/verify
 // Verifies the Razorpay signature after checkout completes
-router.post('/verify', auth, async (req, res) => {
+// GET /payments/my — user's own payments
+router.get('/my', userAuth, async (req, res) => {
+  try {
+    const items = await Payment.find({ customerEmail: req.user.email })
+      .sort({ createdAt: -1 })
+      .limit(50)
+      .lean();
+    res.json(items);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch payments' });
+  }
+});
+
+router.post('/verify', anyAuth, async (req, res) => {
   try {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
       req.body;

@@ -9,9 +9,27 @@ import { DocumentsViewComponent } from './documents-view/documents-view';
 import { CategoriesComponent } from './categories/categories';
 import { DashboardComponent } from './dashboard/dashboard';
 import { PaymentsComponent } from './payments/payments';
+import { LandingComponent } from './landing/landing';
+import { UserRegisterComponent } from './user-register/user-register';
+import { UserLoginComponent } from './user-login/user-login';
+import { UserDashboardComponent } from './user-dashboard/user-dashboard';
+import { userAuthGuard } from './user/user-auth.guard';
 
 export const appRoutes: Route[] = [
+  // Public user-facing routes
+  { path: '', component: LandingComponent, pathMatch: 'full' },
+  { path: 'register', component: UserRegisterComponent },
+  { path: 'user-login', component: UserLoginComponent },
+  {
+    path: 'user-dashboard',
+    component: UserDashboardComponent,
+    canActivate: [userAuthGuard],
+  },
+
+  // Admin login
   { path: 'login', component: LoginComponent },
+
+  // Admin panel (AdminComponent is the layout shell)
   {
     path: '',
     component: AdminComponent,
@@ -24,8 +42,8 @@ export const appRoutes: Route[] = [
       { path: 'settings', component: SettingsComponent },
       { path: 'categories', component: CategoriesComponent },
       { path: 'payments', component: PaymentsComponent },
-      { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
     ],
   },
+
   { path: '**', redirectTo: '' },
 ];

@@ -31,7 +31,7 @@ export class LoginComponent {
     this.auth.login(this.model.email, this.model.password).subscribe({
       next: () => {
         this.loading = false;
-        this.router.navigateByUrl('/admin');
+        this.router.navigateByUrl('/dashboard');
       },
       error: (err) => {
         this.loading = false;

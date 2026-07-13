@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { UserService } from '../user/user.service';
 import { PaymentService, PaymentRecord } from '../payments/payment.service';
@@ -11,7 +11,7 @@ declare const Razorpay: any;
 @Component({
   selector: 'app-user-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule],
   templateUrl: './user-dashboard.html',
 })
 export class UserDashboardComponent implements OnInit {

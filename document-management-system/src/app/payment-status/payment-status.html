@@ -1,0 +1,40 @@
+<div class="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+  <div class="w-full max-w-md bg-white rounded-lg shadow p-8 text-center">
+    <div
+      class="mx-auto mb-4 w-14 h-14 rounded-full flex items-center justify-center text-3xl"
+      [ngClass]="{
+        'bg-green-100 text-green-700': isPaid,
+        'bg-yellow-100 text-yellow-700': isCancelled,
+        'bg-red-100 text-red-700': !isPaid && !isCancelled
+      }"
+    >
+      <span *ngIf="isPaid">&#10003;</span>
+      <span *ngIf="isCancelled">!</span>
+      <span *ngIf="!isPaid && !isCancelled">&#10005;</span>
+    </div>
+
+    <h1 class="text-xl font-semibold text-gray-900">{{ heading }}</h1>
+    <p class="mt-2 text-sm text-gray-600">{{ message }}</p>
+
+    <dl class="mt-6 text-left text-sm border-t border-gray-200 pt-4 space-y-2">
+      <div *ngIf="result.order_id" class="flex justify-between gap-4">
+        <dt class="text-gray-500">Order ID</dt>
+        <dd class="font-mono text-gray-900 break-all">{{ result.order_id }}</dd>
+      </div>
+      <div *ngIf="result.payment_id" class="flex justify-between gap-4">
+        <dt class="text-gray-500">Payment ID</dt>
+        <dd class="font-mono text-gray-900 break-all">
+          {{ result.payment_id }}
+        </dd>
+      </div>
+    </dl>
+
+    <button
+      type="button"
+      (click)="back()"
+      class="mt-6 w-full rounded-md bg-indigo-600 px-4 py-2 text-white text-sm font-medium hover:bg-indigo-700"
+    >
+      Back to dashboard
+    </button>
+  </div>
+</div>

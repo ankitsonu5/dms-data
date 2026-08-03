@@ -2,11 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
 import { UserService } from '../user/user.service';
 import { PaymentService, PaymentRecord } from '../payments/payment.service';
-
-declare const Razorpay: any;
 
 @Component({
   selector: 'app-user-dashboard',
@@ -84,59 +81,12 @@ export class UserDashboardComponent implements OnInit {
       })
       .subscribe({
         next: (order) => {
-          this.paying = false;
-          this.openCheckout(order);
+          // Navigates away to Razorpay's hosted page; the result comes back
+          // via the server-side callback and the /payment-status route.
+          this.paymentSvc.submitHostedCheckout(order);
         },
         error: (err) => {
           this.formError = err?.error?.error || 'Failed to create order';
-          this.paying = false;
-        },
-      });
-  }
-
-  private openCheckout(order: any) {
-    const options = {
-      key: order.keyId,
-      amount: order.amount,
-      currency: order.currency,
-      name: 'U P Awas Evam Vikas Parishad',
-      description: order.description || 'Payment',
-      order_id: order.orderId,
-      prefill: {
-        name: order.customerName,
-        email: order.customerEmail,
-      },
-      theme: { color: '#4f46e5' },
-      handler: (response: any) => this.verifyPayment(response),
-      modal: {
-        ondismiss: () => {
-          this.formError = 'Payment was cancelled';
-          this.paying = false;
-        },
-      },
-    };
-    const rzp = new Razorpay(options);
-    rzp.open();
-  }
-
-  private verifyPayment(response: any) {
-    this.paying = true;
-    this.paymentSvc
-      .verifyPayment({
-        razorpay_order_id: response.razorpay_order_id,
-        razorpay_payment_id: response.razorpay_payment_id,
-        razorpay_signature: response.razorpay_signature,
-      })
-      .subscribe({
-        next: () => {
-          this.paying = false;
-          this.showForm = false;
-          this.successMsg =
-            'Payment successful! Your receipt has been recorded.';
-          this.loadPayments();
-        },
-        error: (err) => {
-          this.formError = err?.error?.error || 'Payment verification failed';
           this.paying = false;
         },
       });

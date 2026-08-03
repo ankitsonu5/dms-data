@@ -4,8 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { PaymentService, PaymentRecord } from './payment.service';
 import { SharedModule } from '../shared/shared.module';
 
-declare const Razorpay: any;
-
 @Component({
   selector: 'app-payments',
   standalone: true,
@@ -116,63 +114,12 @@ export class PaymentsComponent implements OnInit {
       })
       .subscribe({
         next: (order) => {
-          this.paying = false;
-          this.openRazorpayCheckout(order);
+          // Navigates away to Razorpay's hosted page; the result comes back
+          // via the server-side callback and the /payment-status route.
+          this.svc.submitHostedCheckout(order);
         },
         error: (err) => {
           this.formError = err?.error?.error || 'Failed to create order';
-          this.paying = false;
-        },
-      });
-  }
-
-  private openRazorpayCheckout(order: any) {
-    const options = {
-      key: order.keyId,
-      amount: order.amount,
-      currency: order.currency,
-      name: 'HDFC Collect Now',
-      description: order.description || 'Payment',
-      order_id: order.orderId,
-      prefill: {
-        name: order.customerName,
-        email: order.customerEmail,
-        contact: order.customerContact,
-      },
-      theme: { color: '#4f46e5' },
-      handler: (response: any) => {
-        this.verifyPayment(response);
-      },
-      modal: {
-        ondismiss: () => {
-          this.formError = 'Payment was cancelled';
-          this.paying = false;
-        },
-      },
-    };
-
-    const rzp = new Razorpay(options);
-    rzp.open();
-  }
-
-  private verifyPayment(response: any) {
-    this.paying = true;
-    this.svc
-      .verifyPayment({
-        razorpay_order_id: response.razorpay_order_id,
-        razorpay_payment_id: response.razorpay_payment_id,
-        razorpay_signature: response.razorpay_signature,
-      })
-      .subscribe({
-        next: () => {
-          this.paying = false;
-          this.showForm = false;
-          this.successMsg = 'Payment successful!';
-          this.page = 1;
-          this.load();
-        },
-        error: (err) => {
-          this.formError = err?.error?.error || 'Payment verification failed';
           this.paying = false;
         },
       });

@@ -12,6 +12,10 @@ export interface CreateOrderResponse {
   customerName: string;
   customerEmail: string;
   customerContact: string;
+  checkoutUrl: string;
+  merchantName: string;
+  callbackUrl: string;
+  cancelUrl: string;
 }
 
 export interface PaymentRecord {
@@ -30,10 +34,11 @@ export interface PaymentRecord {
   updatedAt: string;
 }
 
-export interface VerifyPaymentPayload {
-  razorpay_order_id: string;
-  razorpay_payment_id: string;
-  razorpay_signature: string;
+export interface PaymentStatusResult {
+  status: 'paid' | 'failed' | 'cancelled' | 'attempted' | string;
+  order_id?: string;
+  payment_id?: string;
+  reason?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -55,13 +60,45 @@ export class PaymentService {
     );
   }
 
-  verifyPayment(
-    payload: VerifyPaymentPayload
-  ): Observable<{ ok: boolean; payment: PaymentRecord }> {
-    return this.http.post<{ ok: boolean; payment: PaymentRecord }>(
-      `${this.api}/payments/verify`,
-      payload
-    );
+  /**
+   * Razorpay Hosted Checkout: the options are submitted as form-data in a
+   * top-level POST, which navigates the browser to Razorpay's hosted payment
+   * page. Razorpay then posts the result back to callback_url server-side, so
+   * there is no client-side handler and no signature verification in the browser.
+   */
+  submitHostedCheckout(order: CreateOrderResponse): void {
+    const fields: Record<string, string> = {
+      key_id: order.keyId,
+      amount: String(order.amount),
+      currency: order.currency,
+      order_id: order.orderId,
+      name: order.merchantName,
+      description: order.description || 'Payment',
+      'prefill[name]': order.customerName || '',
+      'prefill[email]': order.customerEmail || '',
+      'prefill[contact]': order.customerContact || '',
+      callback_url: order.callbackUrl,
+      cancel_url: `${order.cancelUrl}?order_id=${encodeURIComponent(
+        order.orderId
+      )}`,
+    };
+
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = order.checkoutUrl;
+    form.style.display = 'none';
+
+    for (const [name, value] of Object.entries(fields)) {
+      if (!value) continue;
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = name;
+      input.value = value;
+      form.appendChild(input);
+    }
+
+    document.body.appendChild(form);
+    form.submit();
   }
 
   myPayments(): Observable<PaymentRecord[]> {

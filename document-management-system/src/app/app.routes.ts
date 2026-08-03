@@ -16,6 +16,8 @@ import { UserDashboardComponent } from './user-dashboard/user-dashboard';
 import { userAuthGuard } from './user/user-auth.guard';
 import { UserForgotComponent } from './user-forgot/user-forgot';
 import { UserResetComponent } from './user-reset/user-reset';
+import { PaymentStatusComponent } from './payment-status/payment-status';
+import { PaymentStatusComponent } from './payment-status/payment-status';
 
 export const appRoutes: Route[] = [
   // Public user-facing routes
@@ -24,11 +26,15 @@ export const appRoutes: Route[] = [
   { path: 'user-login', component: UserLoginComponent },
   { path: 'user-forgot', component: UserForgotComponent },
   { path: 'user-reset', component: UserResetComponent },
+  // Return target for the Razorpay Hosted Checkout callback redirect. Left
+  // unguarded so the result is never lost if the session lapsed during checkout.
+  { path: 'payment-status', component: PaymentStatusComponent },
   {
     path: 'user-dashboard',
     component: UserDashboardComponent,
     canActivate: [userAuthGuard],
   },
+  { path: 'payment-status', component: PaymentStatusComponent },
 
   // Admin login
   { path: 'login', component: LoginComponent },

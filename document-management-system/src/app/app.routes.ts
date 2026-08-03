@@ -17,7 +17,6 @@ import { userAuthGuard } from './user/user-auth.guard';
 import { UserForgotComponent } from './user-forgot/user-forgot';
 import { UserResetComponent } from './user-reset/user-reset';
 import { PaymentStatusComponent } from './payment-status/payment-status';
-import { PaymentStatusComponent } from './payment-status/payment-status';
 
 export const appRoutes: Route[] = [
   // Public user-facing routes
@@ -34,7 +33,6 @@ export const appRoutes: Route[] = [
     component: UserDashboardComponent,
     canActivate: [userAuthGuard],
   },
-  { path: 'payment-status', component: PaymentStatusComponent },
 
   // Admin login
   { path: 'login', component: LoginComponent },

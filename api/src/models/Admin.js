@@ -13,6 +13,7 @@ const AdminSchema = new mongoose.Schema(
     },
     passwordHash: { type: String, required: true },
     role: { type: String, enum: ['admin'], default: 'admin' },
+    tokenVersion: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

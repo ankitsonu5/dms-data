@@ -4,6 +4,8 @@ const express = require('express');
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 
 const authRouter = require('./routes/auth');
 const documentsRouter = require('./routes/documents');
@@ -35,6 +37,28 @@ async function start() {
 
   const app = express();
   app.disable('x-powered-by');
+
+  // Security headers (fixes CWE-693 Missing Security Headers, CWE-1021 Clickjacking,
+  // CWE-200 Server Version Disclosure)
+  app.use(
+    helmet({
+      contentSecurityPolicy: false, // API-only server, no HTML
+      crossOriginEmbedderPolicy: false,
+    })
+  );
+
+  // Rate limiting — 100 req/15 min globally (fixes CWE-770 No Rate Limiting)
+  app.use(
+    rateLimit({
+      windowMs: 15 * 60 * 1000,
+      max: 100,
+      standardHeaders: true,
+      legacyHeaders: false,
+      message: { error: 'Too many requests, please try again later' },
+      skip: (req) => req.path === '/health',
+    })
+  );
+
   app.use(express.json());
   // Razorpay Hosted Checkout posts its callback as application/x-www-form-urlencoded
   app.use(express.urlencoded({ extended: true }));

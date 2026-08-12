@@ -13,6 +13,7 @@ const UserSchema = new mongoose.Schema(
       trim: true,
     },
     passwordHash: { type: String, required: true },
+    tokenVersion: { type: Number, default: 0 }, // incremented on each login — invalidates old sessions
   },
   { timestamps: true }
 );

@@ -6,6 +6,12 @@ const path = require('path');
 const multer = require('multer');
 const Document = require('../models/Document');
 const { auth } = require('../middleware/auth');
+const {
+  ValidationError,
+  validateString,
+  validateDate,
+  toBoundedInt,
+} = require('../utils/validate');
 
 const router = express.Router();
 
@@ -77,6 +83,19 @@ function fileFilter(_req, file, cb) {
   else cb(new Error('Unsupported file type'), false);
 }
 
+// Validate + sanitize the document metadata payload. Enforced server-side
+// regardless of client checks (audit #11 CWE-20, #12 CWE-20).
+function validateDocumentBody(body, { titleRequired }) {
+  return {
+    title: validateString(body.title, 'title', {
+      required: titleRequired,
+      max: 200,
+    }),
+    description: validateString(body.description, 'description', { max: 2000 }),
+    category: validateString(body.category, 'category', { max: 100 }),
+  };
+}
+
 const upload = multer({
   storage,
   fileFilter,
@@ -93,17 +112,26 @@ router.use(documentsLimiter);
 // List with optional filters and pagination:
 // ?category=..&from=YYYY-MM-DD&to=YYYY-MM-DD&sortBy=createdAt|title|category&sortDir=asc|desc&page=1&limit=20
 router.get('/', auth, async (req, res) => {
-  const { category, from, to } = req.query || {};
+  const { category } = req.query || {};
   const filter = {};
+  let from, to;
+  try {
+    from = validateDate(req.query.from, 'from');
+    to = validateDate(req.query.to, 'to');
+  } catch (err) {
+    if (err instanceof ValidationError) {
+      return res.status(400).json({ error: err.message });
+    }
+    throw err;
+  }
   if (category) filter.category = String(category);
   if (from || to) {
     filter.createdAt = {};
-    if (from) filter.createdAt.$gte = new Date(String(from));
+    if (from) filter.createdAt.$gte = from;
     if (to) {
-      const end = new Date(String(to));
       // include entire day
-      end.setHours(23, 59, 59, 999);
-      filter.createdAt.$lte = end;
+      to.setHours(23, 59, 59, 999);
+      filter.createdAt.$lte = to;
     }
   }
 
@@ -115,12 +143,13 @@ router.get('/', auth, async (req, res) => {
   const sortDir = String(req.query.sortDir || 'desc') === 'asc' ? 1 : -1;
   const sort = { [sortBy]: sortDir };
 
-  // Pagination (only apply if both page and limit are provided)
+  // Pagination (only apply if both page and limit are provided). Bounded to
+  // prevent oversized queries via crafted params (audit #12, CWE-20).
   const page = req.query.page
-    ? Math.max(parseInt(String(req.query.page), 10) || 1, 1)
+    ? toBoundedInt(req.query.page, { def: 1, min: 1, max: 1_000_000 })
     : null;
   const limit = req.query.limit
-    ? Math.max(parseInt(String(req.query.limit), 10) || 1, 1)
+    ? toBoundedInt(req.query.limit, { def: 20, min: 1, max: 100 })
     : null;
 
   if (page && limit) {
@@ -140,12 +169,20 @@ router.get('/', auth, async (req, res) => {
 
 // Create + upload
 router.post('/', auth, upload.single('file'), async (req, res) => {
-  const { title, description, category } = req.body;
   if (!req.file) return res.status(400).json({ error: 'File is required' });
+  let fields;
+  try {
+    fields = validateDocumentBody(req.body, { titleRequired: true });
+  } catch (err) {
+    if (err instanceof ValidationError) {
+      return res.status(400).json({ error: err.message });
+    }
+    throw err;
+  }
   const doc = await Document.create({
-    title,
-    description,
-    category,
+    title: fields.title,
+    description: fields.description,
+    category: fields.category,
     fileName: req.file.originalname,
     mimeType: req.file.mimetype,
     size: req.file.size,
@@ -158,14 +195,27 @@ router.post('/', auth, upload.single('file'), async (req, res) => {
 // Update metadata or replace file
 router.put('/:id', auth, upload.single('file'), async (req, res) => {
   const { id } = req.params;
-  const { title, description, category } = req.body;
+
+  let fields;
+  try {
+    fields = validateDocumentBody(req.body, { titleRequired: false });
+  } catch (err) {
+    if (err instanceof ValidationError) {
+      return res.status(400).json({ error: err.message });
+    }
+    throw err;
+  }
 
   const doc = await Document.findById(id);
   if (!doc) return res.status(404).json({ error: 'Not found' });
 
-  if (typeof title === 'string' && title) doc.title = title;
-  if (typeof description !== 'undefined') doc.description = description;
-  if (typeof category !== 'undefined') doc.category = category;
+  if (fields.title) doc.title = fields.title;
+  if (typeof req.body.description !== 'undefined') {
+    doc.description = fields.description || '';
+  }
+  if (typeof req.body.category !== 'undefined') {
+    doc.category = fields.category || '';
+  }
 
   if (req.file) {
     try {

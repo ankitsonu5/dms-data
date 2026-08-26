@@ -38,11 +38,29 @@ async function start() {
   const app = express();
   app.disable('x-powered-by');
 
-  // Security headers (fixes CWE-693 Missing Security Headers, CWE-1021 Clickjacking,
-  // CWE-200 Server Version Disclosure)
+  // Behind nginx (TLS terminates there); trust it so HSTS is emitted and the
+  // client IP is accurate for rate limiting.
+  app.set('trust proxy', 1);
+
+  // Security response headers — closes audit findings #8 (Missing Security
+  // Headers, CWE-693), #9 (Clickjacking, CWE-1021), and the HSTS part of #10
+  // (Credential transmitted in plaintext, CWE-319). This is a JSON API, so the
+  // CSP is locked down: deny framing and disallow any embedded/active content.
   app.use(
     helmet({
-      contentSecurityPolicy: false, // API-only server, no HTML
+      contentSecurityPolicy: {
+        useDefaults: false,
+        directives: {
+          defaultSrc: ["'none'"],
+          frameAncestors: ["'none'"], // clickjacking (#9)
+          baseUri: ["'none'"],
+          formAction: ["'none'"],
+        },
+      },
+      // Force HTTPS for two years incl. subdomains (#10 / CWE-319)
+      hsts: { maxAge: 63072000, includeSubDomains: true, preload: true },
+      frameguard: { action: 'deny' }, // X-Frame-Options: DENY (#9)
+      referrerPolicy: { policy: 'no-referrer' },
       crossOriginEmbedderPolicy: false,
     })
   );
